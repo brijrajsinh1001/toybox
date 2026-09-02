@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ToyBox — Seller Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --green:#06D6A0; --green-dark:#04A87F; --green-light:#E8FFF8;
+    --orange:#FF6B35; --purple:#7B5EA7;
+    --dark:#2D2A32; --muted:#8A8490; --border:#EEE8E0;
+    --white:#fff; --bg:#F9F7FF;
+  }
+  body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--dark);}
+
+  /* ── AUTH WRAPPER ───────────────────────────── */
+  .auth-wrap{display:flex;min-height:100vh;}
+  .auth-left{
+    width:44%;background:linear-gradient(145deg,#04A87F,#06D6A0,#3BE8C0);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:48px 40px;color:#fff;position:relative;overflow:hidden;
+  }
+  .auth-left::before{
+    content:'';position:absolute;top:-80px;right:-80px;
+    width:320px;height:320px;border-radius:50%;
+    background:rgba(255,255,255,.12);
+  }
+  .auth-left::after{
+    content:'';position:absolute;bottom:-60px;left:-60px;
+    width:240px;height:240px;border-radius:50%;
+    background:rgba(255,255,255,.08);
+  }
+  .auth-logo{font-family:'Baloo 2',cursive;font-size:2.8rem;font-weight:800;z-index:1;}
+  .auth-logo span{font-size:2.4rem;}
+  .auth-tagline{font-size:1.1rem;margin-top:10px;opacity:.9;text-align:center;z-index:1;}
+  .auth-perks{margin-top:40px;display:flex;flex-direction:column;gap:16px;z-index:1;width:100%;}
+  .perk{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.18);
+    border-radius:14px;padding:14px 18px;backdrop-filter:blur(6px);}
+  .perk-icon{font-size:1.6rem;}
+  .perk-text{font-size:.95rem;font-weight:600;}
+
+  /* ── AUTH RIGHT ────────────────────────────── */
+  .auth-right{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 32px;}
+  .auth-card{width:100%;max-width:480px;}
+  .auth-card h2{font-family:'Baloo 2',cursive;font-size:1.9rem;font-weight:800;color:var(--dark);margin-bottom:6px;}
+  .auth-card p.sub{color:var(--muted);font-size:.95rem;margin-bottom:28px;}
+
+  /* tabs */
+  .tabs{display:flex;gap:0;border-radius:12px;overflow:hidden;border:2px solid var(--border);margin-bottom:28px;}
+  .tab{flex:1;padding:11px;text-align:center;font-weight:700;font-size:.95rem;cursor:pointer;transition:.2s;background:var(--white);color:var(--muted);}
+  .tab.active{background:var(--green);color:#fff;}
+
+  /* form */
+  .form-row{display:flex;gap:14px;}
+  .form-group{margin-bottom:18px;flex:1;}
+  .form-group label{display:block;font-weight:700;font-size:.88rem;color:var(--dark);margin-bottom:6px;}
+  .form-group input, .form-group select, .form-group textarea{
+    width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:10px;
+    font-family:'Nunito',sans-serif;font-size:.95rem;color:var(--dark);
+    background:var(--white);transition:.2s;outline:none;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus{border-color:var(--green);}
+  .form-group .hint{font-size:.78rem;color:var(--muted);margin-top:4px;}
+  .form-group .field-wrap{position:relative;}
+  .form-group .field-wrap .status-icon{
+    position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:1rem;
+  }
+
+  /* password strength */
+  .strength-bar{height:4px;border-radius:4px;background:#eee;margin-top:6px;overflow:hidden;}
+  .strength-fill{height:100%;border-radius:4px;width:0;transition:width .3s,background .3s;}
+  .strength-label{font-size:.75rem;margin-top:3px;color:var(--muted);}
+
+  .btn{
+    width:100%;padding:14px;border:none;border-radius:12px;
+    font-family:'Baloo 2',cursive;font-size:1.1rem;font-weight:700;
+    cursor:pointer;transition:.2s;
+  }
+  .btn-green{background:var(--green);color:#fff;}
+  .btn-green:hover{background:var(--green-dark);}
+  .btn-green:disabled{background:#ccc;cursor:not-allowed;}
+
+  .divider{text-align:center;color:var(--muted);font-size:.85rem;margin:20px 0;position:relative;}
+  .divider::before,.divider::after{content:'';position:absolute;top:50%;width:44%;height:1px;background:var(--border);}
+  .divider::before{left:0;} .divider::after{right:0;}
+
+  .msg{padding:12px 16px;border-radius:10px;font-size:.9rem;font-weight:600;margin-bottom:16px;display:none;}
+  .msg.error{background:#FEE2E2;color:#991B1B;}
+  .msg.success{background:#DCFCE7;color:#166534;}
+
+  /* ── DASHBOARD ──────────────────────────────── */
+  .dashboard{display:none;min-height:100vh;background:var(--bg);}
+
+  .dash-nav{
+    background:var(--white);border-bottom:2px solid var(--border);
+    padding:0 32px;display:flex;align-items:center;justify-content:space-between;
+    height:68px;position:sticky;top:0;z-index:100;
+  }
+  .dash-logo{font-family:'Baloo 2',cursive;font-size:1.6rem;font-weight:800;color:var(--green);}
+  .dash-logo span{color:var(--dark);}
+  .dash-user{display:flex;align-items:center;gap:12px;}
+  .dash-avatar{width:40px;height:40px;border-radius:50%;background:var(--green);
+    display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1rem;}
+  .dash-username{font-weight:700;font-size:.95rem;}
+  .btn-logout{background:none;border:2px solid var(--border);border-radius:8px;
+    padding:7px 16px;font-weight:700;cursor:pointer;color:var(--muted);font-size:.85rem;}
+  .btn-logout:hover{border-color:#f00;color:#f00;}
+
+  .dash-body{max-width:1100px;margin:0 auto;padding:32px 24px;}
+
+  /* stats */
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px;}
+  .stat-card{background:var(--white);border-radius:16px;padding:20px 24px;
+    border:2px solid var(--border);display:flex;align-items:center;gap:16px;}
+  .stat-icon{font-size:2rem;width:52px;height:52px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;}
+  .stat-icon.green{background:var(--green-light);}
+  .stat-icon.orange{background:#FFF5F0;}
+  .stat-icon.purple{background:#F3F0FF;}
+  .stat-icon.blue{background:#EFF6FF;}
+  .stat-val{font-family:'Baloo 2',cursive;font-size:1.8rem;font-weight:800;line-height:1;}
+  .stat-lbl{font-size:.8rem;color:var(--muted);font-weight:600;margin-top:3px;}
+
+  /* tabs */
+  .dash-tabs{display:flex;gap:4px;background:var(--white);border-radius:14px;
+    padding:6px;border:2px solid var(--border);margin-bottom:28px;width:fit-content;}
+  .dash-tab{padding:10px 22px;border-radius:10px;font-weight:700;font-size:.9rem;
+    cursor:pointer;transition:.2s;color:var(--muted);}
+  .dash-tab.active{background:var(--green);color:#fff;}
+
+  /* listings table */
+  .panel{background:var(--white);border-radius:16px;padding:24px;border:2px solid var(--border);}
+  .panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+  .panel-title{font-family:'Baloo 2',cursive;font-size:1.2rem;font-weight:800;}
+  .btn-sm{padding:9px 18px;border-radius:10px;font-weight:700;font-size:.85rem;
+    cursor:pointer;border:none;transition:.2s;}
+  .btn-sm.green{background:var(--green);color:#fff;}
+  .btn-sm.green:hover{background:var(--green-dark);}
+  .btn-sm.outline{background:none;border:2px solid var(--border);color:var(--dark);}
+
+  table{width:100%;border-collapse:collapse;}
+  th{text-align:left;font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;
+    color:var(--muted);padding:10px 12px;border-bottom:2px solid var(--border);}
+  td{padding:12px;border-bottom:1px solid var(--border);font-size:.9rem;vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  .badge{padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:700;}
+  .badge.approved{background:#DCFCE7;color:#166534;}
+  .badge.pending{background:#FEF9C3;color:#854D0E;}
+  .badge.rejected{background:#FEE2E2;color:#991B1B;}
+  .badge.rent{background:#DBEAFE;color:#1E40AF;}
+  .badge.buy{background:#F3E8FF;color:#6B21A8;}
+  .badge.both{background:#FFF5F0;color:#9A3412;}
+  .empty-state{text-align:center;padding:48px;color:var(--muted);}
+  .empty-state .icon{font-size:3rem;margin-bottom:12px;}
+
+  /* add toy form */
+  .add-form{max-width:700px;}
+  .section-title{font-family:'Baloo 2',cursive;font-size:1rem;font-weight:800;
+    color:var(--green);margin:24px 0 12px;padding-bottom:6px;
+    border-bottom:2px solid var(--green-light);}
+
+  /* photo upload */
+  .photo-drop{
+    border:2px dashed var(--border);border-radius:14px;padding:32px;
+    text-align:center;cursor:pointer;transition:.2s;
+    background:var(--bg);
+  }
+  .photo-drop:hover{border-color:var(--green);background:var(--green-light);}
+  .photo-drop.dragover{border-color:var(--green);background:var(--green-light);}
+  .photo-drop input[type=file]{display:none;}
+  .photo-drop .drop-icon{font-size:2.4rem;margin-bottom:10px;}
+  .photo-drop .drop-text{font-weight:700;color:var(--dark);}
+  .photo-drop .drop-hint{font-size:.82rem;color:var(--muted);margin-top:4px;}
+
+  .photo-previews{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px;}
+  .photo-preview{position:relative;width:100px;height:100px;border-radius:10px;overflow:hidden;
+    border:2px solid var(--border);}
+  .photo-preview img{width:100%;height:100%;object-fit:cover;}
+  .photo-preview .remove{
+    position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;
+    border:none;border-radius:50%;width:22px;height:22px;font-size:.7rem;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+  }
+  .primary-badge{
+    position:absolute;bottom:4px;left:4px;background:var(--green);color:#fff;
+    font-size:.6rem;font-weight:800;padding:2px 6px;border-radius:4px;
+  }
+
+  /* requests */
+  .req-card{border:2px solid var(--border);border-radius:14px;padding:18px 20px;margin-bottom:14px;}
+  .req-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;}
+  .req-buyer{font-weight:700;}
+  .req-toy{font-size:.85rem;color:var(--muted);margin-top:2px;}
+  .req-msg{background:var(--bg);border-radius:8px;padding:10px 14px;font-size:.88rem;margin-bottom:12px;}
+  .req-actions{display:flex;gap:10px;}
+  .btn-accept{background:var(--green);color:#fff;padding:8px 18px;border:none;
+    border-radius:8px;font-weight:700;font-size:.85rem;cursor:pointer;}
+  .btn-reject{background:#FEE2E2;color:#991B1B;padding:8px 18px;border:none;
+    border-radius:8px;font-weight:700;font-size:.85rem;cursor:pointer;}
+  .req-info{font-size:.82rem;color:var(--muted);}
+
+  @media(max-width:900px){
+    .auth-left{display:none;}
+    .auth-right{padding:24px;}
+    .stats-row{grid-template-columns:repeat(2,1fr);}
+  }
+  @media(max-width:600px){
+    .stats-row{grid-template-columns:1fr 1fr;}
+    .form-row{flex-direction:column;gap:0;}
+    .dash-nav{padding:0 16px;}
+    .dash-body{padding:20px 14px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════ AUTH SECTION ══════════════════════════ -->
+<div class="auth-wrap" id="authSection">
+  <div class="auth-left">
+    <div class="auth-logo"><span>🏪</span> ToyBox</div>
+    <div class="auth-tagline">Seller Portal — Reach thousands of families</div>
+    <div class="auth-perks">
+      <div class="perk"><div class="perk-icon">📦</div><div class="perk-text">List toys for rent or sale — free to join</div></div>
+      <div class="perk"><div class="perk-icon">🔔</div><div class="perk-text">Get instant notifications when buyers enquire</div></div>
+      <div class="perk"><div class="perk-icon">📸</div><div class="perk-text">Upload up to 5 real photos per listing</div></div>
+      <div class="perk"><div class="perk-icon">🛡️</div><div class="perk-text">Buyer deposits protect against damage & loss</div></div>
+    </div>
+  </div>
+  <div class="auth-right">
+    <div class="auth-card">
+      <h2>Welcome, Seller 🏪</h2>
+      <p class="sub">Log in or create your free seller account</p>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('login')">Log In</div>
+        <div class="tab" onclick="switchTab('signup')">Sign Up</div>
+      </div>
+
+      <div id="msgBox" class="msg"></div>
+
+      <!-- LOGIN -->
+      <form id="loginForm">
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com" required/>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="loginPass" placeholder="Your password" required/>
+        </div>
+        <button class="btn btn-green" type="submit">Log In to Dashboard</button>
+      </form>
+
+      <!-- SIGNUP -->
+      <form id="signupForm" style="display:none">
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="sigFirstName" placeholder="Riya" required
+              onkeypress="return /[a-zA-Z ]/.test(event.key)"/>
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="sigLastName" placeholder="Sharma" required
+              onkeypress="return /[a-zA-Z ]/.test(event.key)"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Store / Shop Name</label>
+          <input type="text" id="sigStore" placeholder="Riya's Toy Corner" required/>
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <div class="field-wrap">
+            <input type="email" id="sigEmail" placeholder="store@example.com" required
+              oninput="validateEmail(this,'sigEmailStatus')"
+              onkeydown="if(event.key===' ')event.preventDefault()"
+              onpaste="setTimeout(()=>validateEmail(this,'sigEmailStatus'),10)"/>
+            <span class="status-icon" id="sigEmailStatus"></span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Mobile Number</label>
+            <input type="tel" id="sigMobile" placeholder="9876543210" maxlength="10" required
+              onkeypress="return /[0-9]/.test(event.key)"
+              onkeydown="blockNonDigitKeys(event)"
+              onpaste="cleanPhonePaste(event,'sigMobile')"/>
+            <div class="hint">10 digits only</div>
+          </div>
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" id="sigCity" placeholder="Mumbai" required/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="sigPass" placeholder="Min 8 chars, letter + number" required
+            oninput="checkStrength(this.value)"/>
+          <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+          <div class="strength-label" id="strengthLabel"></div>
+        </div>
+        <button class="btn btn-green" type="submit" id="signupBtn">Create Seller Account</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ DASHBOARD ══════════════════════════ -->
+<div class="dashboard" id="dashboard">
+  <nav class="dash-nav">
+    <div class="dash-logo">🧸 Toy<span>Box</span></div>
+    <div class="dash-user">
+      <div class="dash-avatar" id="avatarLetter">S</div>
+      <div>
+        <div class="dash-username" id="dashName">Seller Name</div>
+        <div style="font-size:.75rem;color:var(--muted)" id="dashStore">Store Name</div>
+      </div>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <div class="dash-body">
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon green">📦</div>
+        <div><div class="stat-val" id="statListings">0</div><div class="stat-lbl">Total Listings</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon orange">✅</div>
+        <div><div class="stat-val" id="statActive">0</div><div class="stat-lbl">Active Listings</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple">🔔</div>
+        <div><div class="stat-val" id="statRequests">0</div><div class="stat-lbl">Pending Requests</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue">🕐</div>
+        <div><div class="stat-val" id="statRentals">0</div><div class="stat-lbl">Total Rentals</div></div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="dash-tabs">
+      <div class="dash-tab active" onclick="showDashTab('listings')">📦 My Listings</div>
+      <div class="dash-tab" onclick="showDashTab('addToy')">➕ Add New Toy</div>
+      <div class="dash-tab" onclick="showDashTab('requests')">🔔 Buyer Requests</div>
+    </div>
+
+    <!-- MY LISTINGS TAB -->
+    <div id="tabListings" class="panel">
+      <div class="panel-header">
+        <div class="panel-title">My Toy Listings</div>
+        <button class="btn-sm green" onclick="showDashTab('addToy')">+ Add New Toy</button>
+      </div>
+      <div id="listingsContent">
+        <div class="empty-state">
+          <div class="icon">📦</div>
+          <div style="font-weight:700;margin-bottom:8px">No listings yet</div>
+          <div>Click "Add New Toy" to create your first listing!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD TOY TAB -->
+    <div id="tabAddToy" class="panel" style="display:none">
+      <div class="panel-header">
+        <div class="panel-title">Add New Toy Listing</div>
+      </div>
+      <form id="addToyForm" class="add-form">
+        <div class="section-title">📝 Basic Information</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Toy Name *</label>
+            <input type="text" id="toyName" placeholder="LEGO Classic Set 10698" required/>
+          </div>
+          <div class="form-group">
+            <label>Brand</label>
+            <input type="text" id="toyBrand" placeholder="LEGO"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category *</label>
+            <select id="toyCategory" required>
+              <option value="">Select category…</option>
+              <option>Building Blocks</option>
+              <option>Educational</option>
+              <option>Outdoor Play</option>
+              <option>Dolls & Figures</option>
+              <option>Vehicles & RC</option>
+              <option>Board Games</option>
+              <option>Arts & Crafts</option>
+              <option>Stuffed Animals</option>
+              <option>Sports & Active</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Age Group *</label>
+            <select id="toyAge" required>
+              <option value="">Select age…</option>
+              <option>0–1 years</option>
+              <option>1–3 years</option>
+              <option>3–5 years</option>
+              <option>5–8 years</option>
+              <option>8–12 years</option>
+              <option>12+ years</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Description *</label>
+          <textarea id="toyDesc" rows="4" placeholder="Describe the toy — what's included, condition, any missing pieces…" required style="resize:vertical;"></textarea>
+        </div>
+
+        <div class="section-title">💰 Listing Type & Pricing</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Listing Type *</label>
+            <select id="toyType" required onchange="togglePrices()">
+              <option value="">Select type…</option>
+              <option value="rent">Rent Only</option>
+              <option value="buy">Sell Only</option>
+              <option value="both">Both (Rent & Sell)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Condition *</label>
+            <select id="toyCondition" required>
+              <option value="">Select condition…</option>
+              <option>Like New</option>
+              <option>Good</option>
+              <option>Fair</option>
+              <option>Parts Missing</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row" id="priceFields" style="display:none">
+          <div class="form-group" id="rentPriceGroup" style="display:none">
+            <label>Rent Price (₹/day) *</label>
+            <input type="number" id="toyRentPrice" placeholder="50" min="1"/>
+          </div>
+          <div class="form-group" id="buyPriceGroup" style="display:none">
+            <label>Selling Price (₹) *</label>
+            <input type="number" id="toyBuyPrice" placeholder="500" min="1"/>
+          </div>
+        </div>
+
+        <div class="section-title">📍 Location</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>City *</label>
+            <input type="text" id="toyCity" placeholder="Mumbai" required/>
+          </div>
+          <div class="form-group">
+            <label>Area / Locality</label>
+            <input type="text" id="toyArea" placeholder="Andheri West"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Pickup / Handover Note</label>
+          <input type="text" id="toyPickup" placeholder="Meet at Andheri station or home delivery within 5km"/>
+        </div>
+
+        <div class="section-title">📸 Toy Photos (up to 5)</div>
+        <div class="photo-drop" id="photoDrop" onclick="document.getElementById('photoInput').click()">
+          <input type="file" id="photoInput" accept="image/*" multiple onchange="handlePhotos(this)"/>
+          <div class="drop-icon">📷</div>
+          <div class="drop-text">Click to upload toy photos</div>
+          <div class="drop-hint">JPG, PNG, WEBP — max 5MB each — up to 5 photos</div>
+          <div class="drop-hint" style="color:var(--green);font-weight:600;margin-top:6px">First photo will be the main display photo</div>
+        </div>
+        <div class="photo-previews" id="photoPreviews"></div>
+
+        <div style="margin-top:28px">
+          <button class="btn btn-green" type="submit" id="submitToyBtn">Submit for Admin Approval</button>
+          <p style="font-size:.8rem;color:var(--muted);margin-top:10px;text-align:center">Your listing will be reviewed and approved within 24 hours</p>
+        </div>
+      </form>
+    </div>
+
+    <!-- BUYER REQUESTS TAB -->
+    <div id="tabRequests" class="panel" style="display:none">
+      <div class="panel-header">
+        <div class="panel-title">🔔 Buyer Requests</div>
+        <button class="btn-sm outline" onclick="loadRequests()">↻ Refresh</button>
+      </div>
+      <div id="requestsContent">
+        <div class="empty-state">
+          <div class="icon">🔔</div>
+          <div style="font-weight:700;margin-bottom:8px">No buyer requests yet</div>
+          <div>When buyers enquire about your toys, they'll appear here.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══ STATE ══
+let token = localStorage.getItem('sellerToken');
+let seller = JSON.parse(localStorage.getItem('sellerData') || 'null');
+let photoFiles = [];
+const API = '';  // Same origin — server.js serves both frontend and API
+
+// ══ INIT ══
+if (token && seller) showDashboard();
+
+// ══ TAB SWITCH ══
+function switchTab(t) {
+  document.getElementById('loginForm').style.display   = t==='login'  ? 'block':'none';
+  document.getElementById('signupForm').style.display  = t==='signup' ? 'block':'none';
+  document.querySelectorAll('.tab').forEach((el,i)=> el.classList.toggle('active', (i===0&&t==='login')||(i===1&&t==='signup')));
+  showMsg('','');
+}
+
+// ══ VALIDATION HELPERS ══
+function validateEmail(input, statusId) {
+  input.value = input.value.replace(/\s/g,'');
+  const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value);
+  document.getElementById(statusId).textContent = input.value ? (ok?'✅':'❌') : '';
+}
+function blockNonDigitKeys(e) {
+  const allowed=['Backspace','Delete','ArrowLeft','ArrowRight','Tab','Home','End'];
+  if(!allowed.includes(e.key) && !/[0-9]/.test(e.key)) e.preventDefault();
+}
+function cleanPhonePaste(e, id) {
+  e.preventDefault();
+  const digits = (e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,10);
+  document.getElementById(id).value = digits;
+}
+function checkStrength(v) {
+  let s=0;
+  if(v.length>=8) s++;
+  if(/[A-Za-z]/.test(v)) s++;
+  if(/[0-9]/.test(v)) s++;
+  if(/[^A-Za-z0-9]/.test(v)) s++;
+  const fill = document.getElementById('strengthFill');
+  const lbl  = document.getElementById('strengthLabel');
+  const colors=['#f00','#f90','#06D6A0'];
+  const labels=['Too short','Weak','Medium','Strong'];
+  fill.style.width  = ['0%','33%','66%','100%'][s];
+  fill.style.background = colors[Math.min(s,2)];
+  lbl.textContent   = labels[s];
+  lbl.style.color   = colors[Math.min(s,2)];
+}
+
+function showMsg(type,text){
+  const el = document.getElementById('msgBox');
+  el.className = 'msg '+(type||'');
+  el.style.display = text ? 'block':'none';
+  el.textContent = text;
+}
+
+// ══ LOGIN ══
+document.getElementById('loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  showMsg('','');
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPass').value;
+  try {
+    const res = await fetch(`${API}/api/sellers/login`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email,password})
+    });
+    const data = await res.json();
+    if(!res.ok) return showMsg('error', data.error||'Login failed.');
+    token  = data.token;
+    seller = data.seller;
+    localStorage.setItem('sellerToken', token);
+    localStorage.setItem('sellerData',  JSON.stringify(seller));
+    showDashboard();
+  } catch(err){ showMsg('error','Cannot connect to server. Make sure backend is running.'); }
+});
+
+// ══ SIGNUP ══
+document.getElementById('signupForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  showMsg('','');
+  const first_name  = document.getElementById('sigFirstName').value.trim();
+  const last_name   = document.getElementById('sigLastName').value.trim();
+  const store_name  = document.getElementById('sigStore').value.trim();
+  const email       = document.getElementById('sigEmail').value.trim();
+  const mobile      = document.getElementById('sigMobile').value.trim();
+  const city        = document.getElementById('sigCity').value.trim();
+  const password    = document.getElementById('sigPass').value;
+  if(mobile.length!==10) return showMsg('error','Mobile must be exactly 10 digits.');
+  if(password.length<8||!/[A-Za-z]/.test(password)||!/[0-9]/.test(password))
+    return showMsg('error','Password must be 8+ chars with letters and numbers.');
+  document.getElementById('signupBtn').disabled = true;
+  try {
+    const res = await fetch(`${API}/api/sellers/register`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({first_name,last_name,store_name,email,mobile,city,password})
+    });
+    const data = await res.json();
+    if(!res.ok){ document.getElementById('signupBtn').disabled=false; return showMsg('error',data.error||'Registration failed.');}
+    showMsg('success','Account created! Please log in.');
+    document.getElementById('signupForm').reset();
+    document.getElementById('signupBtn').disabled=false;
+    setTimeout(()=>switchTab('login'),1500);
+  } catch(err){ document.getElementById('signupBtn').disabled=false; showMsg('error','Cannot connect to server.'); }
+});
+
+// ══ SHOW DASHBOARD ══
+function showDashboard() {
+  document.getElementById('authSection').style.display = 'none';
+  document.getElementById('dashboard').style.display   = 'block';
+  document.getElementById('dashName').textContent  = seller.name;
+  document.getElementById('dashStore').textContent = seller.store_name;
+  document.getElementById('avatarLetter').textContent = (seller.name||'S')[0].toUpperCase();
+  loadDashboardStats();
+  loadListings();
+}
+
+// ══ LOAD STATS ══
+async function loadDashboardStats() {
+  if(!token) return;
+  try {
+    const res = await fetch(`${API}/api/sellers/dashboard`,{headers:{'Authorization':'Bearer '+token}});
+    const d   = await res.json();
+    document.getElementById('statListings').textContent  = d.total_listings  || 0;
+    document.getElementById('statActive').textContent    = d.active_listings  || 0;
+    document.getElementById('statRequests').textContent  = d.pending_requests || 0;
+    document.getElementById('statRentals').textContent   = d.total_rentals    || 0;
+  } catch(e){}
+}
+
+// ══ LOAD LISTINGS ══
+async function loadListings() {
+  if(!token) return;
+  try {
+    const res = await fetch(`${API}/api/sellers/my-listings`,{headers:{'Authorization':'Bearer '+token}});
+    const rows = await res.json();
+    const container = document.getElementById('listingsContent');
+    if(!rows.length){
+      container.innerHTML=`<div class="empty-state"><div class="icon">📦</div><div style="font-weight:700;margin-bottom:8px">No listings yet</div><div>Click "Add New Toy" to create your first listing!</div></div>`;
+      return;
+    }
+    container.innerHTML = `<table>
+      <thead><tr><th>Toy</th><th>Category</th><th>Type</th><th>Price</th><th>Status</th><th>Views</th></tr></thead>
+      <tbody>${rows.map(r=>`
+        <tr>
+          <td><strong>${r.name}</strong>${r.brand?`<br><span style="font-size:.78rem;color:var(--muted)">${r.brand}</span>`:''}</td>
+          <td>${r.category}</td>
+          <td><span class="badge ${r.listing_type}">${r.listing_type}</span></td>
+          <td>${r.listing_type==='rent'?`₹${r.rent_price}/day`:r.listing_type==='buy'?`₹${r.buy_price}`:`₹${r.rent_price}/d · ₹${r.buy_price}`}</td>
+          <td><span class="badge ${r.status}">${r.status}</span></td>
+          <td>${r.views}</td>
+        </tr>`).join('')}
+      </tbody></table>`;
+  } catch(e){ document.getElementById('listingsContent').innerHTML='<div class="empty-state">Could not load listings.</div>'; }
+}
+
+// ══ LOAD REQUESTS ══
+async function loadRequests() {
+  if(!token) return;
+  try {
+    const res = await fetch(`${API}/api/sellers/requests`,{headers:{'Authorization':'Bearer '+token}});
+    const rows = await res.json();
+    const container = document.getElementById('requestsContent');
+    if(!rows.length){
+      container.innerHTML=`<div class="empty-state"><div class="icon">🔔</div><div style="font-weight:700;margin-bottom:8px">No buyer requests yet</div><div>When buyers enquire about your toys, they'll appear here.</div></div>`;
+      return;
+    }
+    container.innerHTML = rows.map(r=>`
+      <div class="req-card">
+        <div class="req-header">
+          <div>
+            <div class="req-buyer">👤 ${r.first_name} ${r.last_name} · ${r.buyer_city}</div>
+            <div class="req-toy">🧸 ${r.toy_name} · ${r.request_type.toUpperCase()}</div>
+          </div>
+          <span class="badge ${r.status}">${r.status}</span>
+        </div>
+        <div class="req-msg">${r.message}</div>
+        ${r.status==='pending'?`
+        <div class="req-actions">
+          <button class="btn-accept" onclick="respondRequest(${r.id},'accepted')">✅ Accept</button>
+          <button class="btn-reject" onclick="respondRequest(${r.id},'rejected')">❌ Reject</button>
+          <div class="req-info">📞 ${r.buyer_mobile}</div>
+        </div>`:`<div class="req-info">📞 ${r.buyer_mobile} · Responded: ${r.status}</div>`}
+      </div>`).join('');
+  } catch(e){ document.getElementById('requestsContent').innerHTML='<div class="empty-state">Could not load requests.</div>'; }
+}
+
+// ══ RESPOND TO REQUEST ══
+async function respondRequest(id, status) {
+  try {
+    const res = await fetch(`${API}/api/requests/${id}/respond`,{
+      method:'PUT',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},
+      body:JSON.stringify({status})
+    });
+    if(res.ok){ loadRequests(); loadDashboardStats(); }
+  } catch(e){ alert('Could not update request.'); }
+}
+
+// ══ DASHBOARD TABS ══
+function showDashTab(tab) {
+  ['tabListings','tabAddToy','tabRequests'].forEach(id=>document.getElementById(id).style.display='none');
+  document.querySelectorAll('.dash-tab').forEach((el,i)=>{
+    el.classList.toggle('active',['listings','addToy','requests'][i]===tab);
+  });
+  document.getElementById('tab'+tab.charAt(0).toUpperCase()+tab.slice(1)).style.display='block';
+  if(tab==='requests') loadRequests();
+  if(tab==='listings') loadListings();
+}
+
+// ══ PRICE TOGGLE ══
+function togglePrices() {
+  const type = document.getElementById('toyType').value;
+  const pf   = document.getElementById('priceFields');
+  const rg   = document.getElementById('rentPriceGroup');
+  const bg   = document.getElementById('buyPriceGroup');
+  pf.style.display = type ? 'flex':'none';
+  rg.style.display = (type==='rent'||type==='both') ? 'block':'none';
+  bg.style.display = (type==='buy' ||type==='both') ? 'block':'none';
+}
+
+// ══ PHOTO UPLOAD ══
+function handlePhotos(input) {
+  const files = Array.from(input.files);
+  const remaining = 5 - photoFiles.length;
+  files.slice(0,remaining).forEach(f => {
+    if(f.size > 5*1024*1024){ alert(`${f.name} is too large (max 5MB)`); return; }
+    photoFiles.push(f);
+    const reader = new FileReader();
+    reader.onload = ev => renderPreviews();
+    reader.readAsDataURL(f);
+  });
+  setTimeout(renderPreviews, 50);
+  input.value='';
+}
+function renderPreviews() {
+  const container = document.getElementById('photoPreviews');
+  container.innerHTML = '';
+  photoFiles.forEach((f,i) => {
+    const url = URL.createObjectURL(f);
+    const div = document.createElement('div');
+    div.className='photo-preview';
+    div.innerHTML=`<img src="${url}"/>${i===0?'<div class="primary-badge">MAIN</div>':''}<button class="remove" onclick="removePhoto(${i})">✕</button>`;
+    container.appendChild(div);
+  });
+}
+function removePhoto(i){ photoFiles.splice(i,1); renderPreviews(); }
+
+// Drag and drop
+const drop = document.getElementById('photoDrop');
+drop.addEventListener('dragover',e=>{e.preventDefault();drop.classList.add('dragover');});
+drop.addEventListener('dragleave',()=>drop.classList.remove('dragover'));
+drop.addEventListener('drop',e=>{
+  e.preventDefault();drop.classList.remove('dragover');
+  const fakeInput = {files:e.dataTransfer.files};
+  handlePhotos(fakeInput);
+});
+
+// ══ ADD TOY SUBMIT ══
+document.getElementById('addToyForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  if(!token) return;
+  const type = document.getElementById('toyType').value;
+  const fd   = new FormData();
+  fd.append('name',         document.getElementById('toyName').value.trim());
+  fd.append('brand',        document.getElementById('toyBrand').value.trim());
+  fd.append('category',     document.getElementById('toyCategory').value);
+  fd.append('age_group',    document.getElementById('toyAge').value);
+  fd.append('description',  document.getElementById('toyDesc').value.trim());
+  fd.append('listing_type', type);
+  fd.append('condition_tag',document.getElementById('toyCondition').value);
+  fd.append('city',         document.getElementById('toyCity').value.trim());
+  fd.append('area',         document.getElementById('toyArea').value.trim());
+  fd.append('pickup_note',  document.getElementById('toyPickup').value.trim());
+  if(type==='rent'||type==='both') fd.append('rent_price', document.getElementById('toyRentPrice').value);
+  if(type==='buy' ||type==='both') fd.append('buy_price',  document.getElementById('toyBuyPrice').value);
+  photoFiles.forEach((f,i)=> fd.append('images', f));
+
+  const btn = document.getElementById('submitToyBtn');
+  btn.disabled=true; btn.textContent='Submitting…';
+  try {
+    const res = await fetch(`${API}/api/listings`,{
+      method:'POST', headers:{'Authorization':'Bearer '+token}, body:fd
+    });
+    const data = await res.json();
+    if(!res.ok){ btn.disabled=false; btn.textContent='Submit for Admin Approval'; alert(data.error||'Failed to submit listing.'); return; }
+    btn.disabled=false; btn.textContent='Submit for Admin Approval';
+    document.getElementById('addToyForm').reset();
+    photoFiles=[];
+    document.getElementById('photoPreviews').innerHTML='';
+    togglePrices();
+    alert('✅ Listing submitted for approval! It will go live once admin approves it.');
+    loadDashboardStats();
+    showDashTab('listings');
+  } catch(err){ btn.disabled=false; btn.textContent='Submit for Admin Approval'; alert('Cannot connect to server.'); }
+});
+
+// ══ LOGOUT ══
+function logout(){
+  localStorage.removeItem('sellerToken');
+  localStorage.removeItem('sellerData');
+  token=null; seller=null;
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('authSection').style.display='flex';
+  switchTab('login');
+}
+</script>
+</body>
+</html>

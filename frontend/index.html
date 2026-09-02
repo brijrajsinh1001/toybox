@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ToyBox — Connect. Rent. Play.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:#FFF9F0; --primary:#FF6B35; --primary-dark:#e05520;
+      --secondary:#FFD166; --accent:#06D6A0; --purple:#7B5EA7;
+      --dark:#2D2A32; --muted:#8A8490; --card:#FFFFFF;
+      --border:#EEE8E0; --shadow:0 4px 24px rgba(45,42,50,0.10); --r:20px;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--dark);overflow-x:hidden;}
+
+    /* NAV */
+    nav{position:sticky;top:0;z-index:100;background:rgba(255,249,240,0.93);
+      backdrop-filter:blur(14px);border-bottom:2px solid var(--border);
+      padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:68px;}
+    .logo{font-family:'Baloo 2',cursive;font-size:1.7rem;font-weight:800;
+      color:var(--primary);display:flex;align-items:center;gap:6px;text-decoration:none;cursor:pointer;}
+    .logo span{color:var(--purple);}
+    .nav-links{display:flex;gap:4px;list-style:none;}
+    .nav-links a{text-decoration:none;color:var(--dark);font-weight:700;font-size:0.9rem;
+      padding:7px 16px;border-radius:50px;transition:all .2s;cursor:pointer;}
+    .nav-links a:hover{background:var(--secondary);}
+    .nav-links a.active{background:var(--primary);color:#fff;}
+    .nav-actions{display:flex;gap:10px;}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 22px;border-radius:50px;
+      font-family:'Nunito',sans-serif;font-weight:700;font-size:0.88rem;cursor:pointer;
+      border:none;transition:all .2s;text-decoration:none;}
+    .btn-primary{background:var(--primary);color:#fff;box-shadow:0 4px 14px rgba(255,107,53,.3);}
+    .btn-primary:hover{background:var(--primary-dark);transform:translateY(-2px);}
+    .btn-outline{background:transparent;color:var(--primary);border:2px solid var(--primary);}
+    .btn-outline:hover{background:var(--primary);color:#fff;transform:translateY(-2px);}
+    .btn-accent{background:var(--accent);color:#fff;}
+    .btn-accent:hover{background:#05bc8d;transform:translateY(-2px);}
+    .btn-purple{background:var(--purple);color:#fff;}
+    .btn-purple:hover{background:#6a4f92;transform:translateY(-2px);}
+
+    /* PAGES */
+    .page{display:none;}.page.active{display:block;}
+
+    /* HERO */
+    .hero{min-height:calc(100vh - 68px);display:flex;flex-direction:column;
+      align-items:center;justify-content:center;text-align:center;padding:60px 40px;}
+    .hero-badge{background:var(--secondary);color:var(--dark);font-weight:700;
+      font-size:0.82rem;padding:6px 18px;border-radius:50px;margin-bottom:22px;
+      display:inline-block;animation:fadeUp .6s ease both;}
+    .hero h1{font-family:'Baloo 2',cursive;font-size:clamp(2.6rem,7vw,5rem);
+      font-weight:800;line-height:1.1;margin-bottom:18px;animation:fadeUp .7s .1s ease both;}
+    .hero h1 em{color:var(--primary);font-style:normal;position:relative;}
+    .hero h1 em::after{content:'';position:absolute;bottom:-2px;left:0;width:100%;
+      height:5px;background:var(--secondary);border-radius:10px;z-index:-1;}
+    .hero p{font-size:1.1rem;color:var(--muted);max-width:520px;line-height:1.7;
+      margin-bottom:32px;animation:fadeUp .7s .2s ease both;}
+    .hero-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;
+      margin-bottom:56px;animation:fadeUp .7s .3s ease both;}
+    .hero-stats{display:flex;gap:40px;flex-wrap:wrap;justify-content:center;
+      animation:fadeUp .7s .4s ease both;}
+    .stat-num{font-family:'Baloo 2',cursive;font-size:2rem;font-weight:800;color:var(--primary);}
+    .stat-lbl{font-size:0.8rem;color:var(--muted);font-weight:600;}
+
+    /* HOW IT WORKS BANNER */
+    .platform-banner{background:var(--dark);color:#fff;padding:28px 40px;
+      display:flex;align-items:center;justify-content:center;gap:60px;flex-wrap:wrap;}
+    .banner-step{display:flex;align-items:center;gap:12px;font-weight:700;font-size:0.9rem;}
+    .banner-step .num{background:var(--primary);width:32px;height:32px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;flex-shrink:0;}
+    .banner-arrow{color:var(--secondary);font-size:1.4rem;}
+
+    /* MEMBERSHIP SECTION */
+    .membership-section{padding:64px 40px;background:linear-gradient(135deg,#fff5ee,#fff9f0);}
+    .mem-inner{max-width:1100px;margin:0 auto;display:grid;
+      grid-template-columns:1fr 1fr;gap:48px;align-items:center;}
+    .mem-left h2{font-family:'Baloo 2',cursive;font-size:2.2rem;font-weight:800;margin-bottom:14px;}
+    .mem-left h2 span{color:var(--primary);}
+    .mem-left p{color:var(--muted);line-height:1.7;margin-bottom:24px;}
+    .mem-card{background:var(--card);border-radius:24px;padding:32px;
+      border:3px solid var(--secondary);box-shadow:0 8px 40px rgba(255,107,53,.12);
+      text-align:center;}
+    .mem-amount{font-family:'Baloo 2',cursive;font-size:3.5rem;font-weight:800;
+      color:var(--primary);margin-bottom:4px;}
+    .mem-label{font-size:1rem;font-weight:700;color:var(--dark);margin-bottom:20px;}
+    .mem-rules{display:flex;flex-direction:column;gap:12px;text-align:left;}
+    .mem-rule{display:flex;gap:12px;align-items:flex-start;
+      padding:12px;border-radius:14px;font-size:0.85rem;font-weight:600;line-height:1.5;}
+    .mem-rule.good{background:#e8faf5;color:#047857;}
+    .mem-rule.warn{background:#fff7ed;color:#b45309;}
+    .mem-rule.bad{background:#fef2f2;color:#b91c1c;}
+    .mem-rule .icon{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
+
+    /* BROWSE */
+    .section{padding:60px 40px;max-width:1200px;margin:0 auto;}
+    .sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:10px;}
+    .sec-title{font-family:'Baloo 2',cursive;font-size:1.8rem;font-weight:800;}
+    .sec-title span{color:var(--primary);}
+    .filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px;}
+    .fbtn{padding:8px 18px;border-radius:50px;border:2px solid var(--border);
+      background:var(--card);cursor:pointer;font-family:'Nunito',sans-serif;
+      font-weight:700;font-size:0.85rem;transition:all .2s;}
+    .fbtn:hover,.fbtn.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+    .search-row{display:flex;gap:10px;margin-bottom:24px;}
+    .search-row input{flex:1;padding:12px 20px;border-radius:50px;border:2px solid var(--border);
+      background:var(--card);font-family:'Nunito',sans-serif;font-size:0.92rem;
+      outline:none;transition:border-color .2s;}
+    .search-row input:focus{border-color:var(--primary);}
+    .toy-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:22px;}
+    .toy-card{background:var(--card);border-radius:var(--r);overflow:hidden;
+      box-shadow:var(--shadow);border:2px solid var(--border);transition:all .25s;cursor:pointer;}
+    .toy-card:hover{transform:translateY(-6px);box-shadow:0 14px 40px rgba(45,42,50,.14);border-color:var(--primary);}
+    .toy-img{width:100%;height:200px;display:flex;align-items:center;justify-content:center;
+      font-size:5.5rem;position:relative;overflow:hidden;background:#f5f0e8;}
+    .toy-img img{width:100%;height:100%;object-fit:cover;}
+    .toy-img .no-photo{display:flex;flex-direction:column;align-items:center;justify-content:center;
+      width:100%;height:100%;color:#ccc;font-size:3rem;gap:6px;}
+    .toy-img .no-photo span{font-size:.75rem;font-weight:600;color:#bbb;}
+    /* Modal photo gallery */
+    .photo-gallery{width:100%;height:300px;position:relative;border-radius:24px 24px 0 0;overflow:hidden;background:#f0ece4;}
+    .gallery-slides{display:flex;height:100%;transition:transform .35s ease;}
+    .gallery-slide{min-width:100%;height:100%;object-fit:cover;}
+    .gallery-slide.no-img{display:flex;align-items:center;justify-content:center;font-size:5rem;background:#f5f0e8;min-width:100%;}
+    .gallery-prev,.gallery-next{position:absolute;top:50%;transform:translateY(-50%);
+      background:rgba(255,255,255,.85);border:none;border-radius:50%;width:36px;height:36px;
+      font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;
+      transition:.2s;z-index:5;}
+    .gallery-prev{left:12px;} .gallery-next{right:12px;}
+    .gallery-prev:hover,.gallery-next:hover{background:#fff;}
+    .gallery-dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+      display:flex;gap:6px;z-index:5;}
+    .gallery-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.6);cursor:pointer;transition:.2s;}
+    .gallery-dot.active{background:#fff;transform:scale(1.2);}
+    .gallery-count{position:absolute;top:12px;right:52px;background:rgba(0,0,0,.5);
+      color:#fff;font-size:.75rem;padding:3px 9px;border-radius:10px;}
+    .type-badge{position:absolute;top:12px;left:12px;padding:4px 12px;border-radius:50px;
+      font-size:0.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;}
+    .badge-rent{background:var(--accent);color:#fff;}
+    .badge-buy{background:var(--purple);color:#fff;}
+    .badge-both{background:var(--primary);color:#fff;}
+    .cond-badge{position:absolute;top:12px;right:12px;background:rgba(255,255,255,.92);
+      padding:4px 10px;border-radius:50px;font-size:0.7rem;font-weight:700;}
+    .toy-body{padding:18px;}
+    .toy-name{font-family:'Baloo 2',cursive;font-size:1.05rem;font-weight:700;margin-bottom:4px;}
+    .toy-meta{font-size:0.8rem;color:var(--muted);margin-bottom:10px;}
+    .toy-age{display:inline-block;background:var(--bg);border-radius:50px;
+      padding:2px 10px;font-size:0.76rem;font-weight:700;margin-right:6px;}
+    .toy-price-row{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
+    .price-chip{padding:6px 14px;border-radius:50px;font-size:0.82rem;font-weight:700;}
+    .price-rent{background:#e8faf5;color:#047857;}
+    .price-buy{background:#f0ebfa;color:var(--purple);}
+    .toy-actions{display:flex;gap:8px;}
+    .toy-actions .btn{flex:1;justify-content:center;padding:9px 8px;font-size:0.82rem;}
+    .seller-name{font-size:0.78rem;color:var(--muted);display:flex;align-items:center;gap:4px;margin-bottom:10px;}
+
+    /* CATEGORIES */
+    .cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:14px;}
+    .cat-card{background:var(--card);border-radius:18px;padding:20px 12px;
+      text-align:center;border:2px solid var(--border);cursor:pointer;transition:all .2s;}
+    .cat-card:hover{border-color:var(--primary);transform:translateY(-3px);}
+    .cat-icon{font-size:2.4rem;margin-bottom:8px;}
+    .cat-name{font-weight:700;font-size:0.83rem;}
+
+    /* HOW SECTION */
+    .how-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;}
+    .how-card{background:var(--card);border-radius:var(--r);padding:28px 20px;
+      text-align:center;border:2px solid var(--border);transition:all .25s;}
+    .how-card:hover{border-color:var(--primary);transform:translateY(-4px);}
+    .how-icon{font-size:2.8rem;margin-bottom:14px;display:block;}
+    .how-step{background:var(--primary);color:#fff;width:26px;height:26px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;font-weight:800;
+      font-size:0.82rem;margin:0 auto 10px;}
+    .how-title{font-family:'Baloo 2',cursive;font-size:1rem;font-weight:700;margin-bottom:6px;}
+    .how-desc{font-size:0.82rem;color:var(--muted);line-height:1.6;}
+
+    /* TOY DETAIL MODAL */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(45,42,50,.6);
+      backdrop-filter:blur(4px);z-index:300;align-items:center;justify-content:center;padding:20px;}
+    .modal-overlay.active{display:flex;}
+    .modal{background:var(--card);border-radius:28px;width:100%;max-width:640px;
+      max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(45,42,50,.2);
+      animation:modalIn .3s ease;}
+    @keyframes modalIn{from{transform:translateY(30px) scale(.96);opacity:0;}to{transform:translateY(0) scale(1);opacity:1;}}
+    .modal-img{width:100%;height:280px;display:flex;align-items:center;justify-content:center;
+      font-size:7rem;border-radius:28px 28px 0 0;position:relative;}
+    .modal-img img{width:100%;height:100%;object-fit:cover;border-radius:28px 28px 0 0;}
+    .modal-close{position:absolute;top:14px;right:14px;background:rgba(255,255,255,.9);
+      border:none;cursor:pointer;width:36px;height:36px;border-radius:50%;
+      font-size:1rem;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+    .modal-close:hover{background:#fff;}
+    .modal-body{padding:28px;}
+    .modal-title{font-family:'Baloo 2',cursive;font-size:1.6rem;font-weight:800;margin-bottom:6px;}
+    .modal-seller{font-size:0.85rem;color:var(--muted);margin-bottom:16px;}
+    .modal-seller strong{color:var(--dark);}
+    .contact-box{background:linear-gradient(135deg,#fff5ee,#fffbf0);border:2px solid var(--secondary);
+      border-radius:18px;padding:20px;margin:20px 0;}
+    .contact-box h4{font-family:'Baloo 2',cursive;font-size:1rem;font-weight:800;margin-bottom:10px;}
+    .contact-steps{display:flex;flex-direction:column;gap:8px;}
+    .contact-step{display:flex;align-items:center;gap:10px;font-size:0.85rem;font-weight:600;}
+    .c-num{background:var(--primary);color:#fff;width:22px;height:22px;border-radius:50%;
+      display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:800;flex-shrink:0;}
+    .deposit-note{background:#fef3c7;border:2px solid #f59e0b;border-radius:14px;
+      padding:14px 16px;font-size:0.83rem;font-weight:600;color:#92400e;margin-top:12px;
+      display:flex;align-items:flex-start;gap:8px;}
+
+    /* PROFILE */
+    .profile-hero{background:linear-gradient(135deg,var(--primary),#ff9a6c);
+      padding:48px 40px 80px;text-align:center;color:#fff;}
+    .avatar{width:84px;height:84px;border-radius:50%;background:rgba(255,255,255,.25);
+      display:flex;align-items:center;justify-content:center;font-size:2.8rem;
+      margin:0 auto 14px;border:4px solid rgba(255,255,255,.5);}
+    .profile-name{font-family:'Baloo 2',cursive;font-size:1.7rem;font-weight:800;margin-bottom:4px;}
+    .profile-body{max-width:800px;margin:-40px auto 0;padding:0 40px 60px;}
+    .pcard{background:var(--card);border-radius:var(--r);padding:26px;
+      margin-bottom:18px;box-shadow:var(--shadow);border:2px solid var(--border);}
+    .pcard h3{font-family:'Baloo 2',cursive;font-size:1.05rem;font-weight:800;margin-bottom:16px;}
+    .order-row{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);}
+    .order-row:last-child{border-bottom:none;}
+    .order-emoji{font-size:2rem;}
+    .order-info{flex:1;}
+    .order-name{font-weight:700;font-size:0.88rem;}
+    .order-detail{font-size:0.76rem;color:var(--muted);}
+    .status{font-size:0.72rem;font-weight:800;padding:4px 12px;border-radius:50px;}
+    .s-active{background:#e8faf5;color:#047857;}
+    .s-done{background:#f0ebfa;color:var(--purple);}
+    .mem-status-card{background:linear-gradient(135deg,var(--secondary),#ffba08);
+      border-radius:18px;padding:20px 24px;display:flex;align-items:center;
+      justify-content:space-between;margin-bottom:18px;}
+    .mem-status-card .label{font-size:0.85rem;font-weight:700;color:var(--dark);}
+    .mem-status-card .val{font-family:'Baloo 2',cursive;font-size:1.6rem;font-weight:800;color:var(--dark);}
+
+    /* FOOTER */
+    footer{background:var(--dark);color:rgba(255,255,255,.7);padding:48px 40px 24px;margin-top:40px;}
+    .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:36px;max-width:1100px;margin:0 auto 32px;}
+    .footer-logo{font-family:'Baloo 2',cursive;font-size:1.5rem;font-weight:800;color:#fff;margin-bottom:8px;}
+    .footer-logo span{color:var(--secondary);}
+    .footer-desc{font-size:0.83rem;line-height:1.6;}
+    .footer-col h4{color:#fff;font-weight:800;margin-bottom:12px;font-size:0.88rem;}
+    .footer-col a{display:block;color:rgba(255,255,255,.6);text-decoration:none;
+      font-size:0.83rem;margin-bottom:7px;transition:color .2s;cursor:pointer;}
+    .footer-col a:hover{color:var(--secondary);}
+    .footer-bottom{max-width:1100px;margin:0 auto;padding-top:18px;
+      border-top:1px solid rgba(255,255,255,.1);display:flex;
+      align-items:center;justify-content:space-between;font-size:0.8rem;flex-wrap:wrap;gap:8px;}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);
+      background:var(--dark);color:#fff;padding:12px 24px;border-radius:50px;
+      font-weight:700;font-size:0.88rem;z-index:500;transition:transform .3s;}
+    .toast.show{transform:translateX(-50%) translateY(0);}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+    @media(max-width:768px){
+      nav{padding:0 20px;} .nav-links{display:none;}
+      .hero{padding:40px 20px;} .section{padding:40px 20px;}
+      .mem-inner{grid-template-columns:1fr;} .footer-grid{grid-template-columns:1fr 1fr;}
+      .platform-banner{gap:24px;padding:20px;} .profile-body{padding:0 20px 40px;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" onclick="showPage('home')">🧸 Toy<span>Box</span></a>
+  <ul class="nav-links">
+    <li><a class="active" onclick="showPage('home');setActive(this)">Home</a></li>
+    <li><a onclick="showPage('browse');setActive(this)">Browse Toys</a></li>
+    <li><a onclick="showPage('how');setActive(this)">How It Works</a></li>
+    <li><a onclick="showPage('membership');setActive(this)">Membership</a></li>
+    <li><a onclick="showPage('profile');setActive(this);initBuyerDash()" onclick="initBuyerDash()">My Account</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="login-seller.html" class="btn btn-accent">🏪 Seller Login</a>
+    <a href="login-buyer.html" class="btn btn-primary">👤 Buyer Login</a>
+  </div>
+</nav>
+
+<!-- ===== HOME ===== -->
+<div class="page active" id="page-home">
+  <section class="hero">
+    <div class="hero-badge">🌱 A Peer-to-Peer Toy Marketplace — No Middlemen!</div>
+    <h1>Rent &amp; Buy<br/><em>Pre-Loved Toys</em><br/>Near You</h1>
+    <p>ToyBox connects families directly. Find a toy, contact the seller, arrange pickup — simple, affordable, sustainable.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="showPage('browse');setActiveNav('Browse Toys')">🔍 Browse Toys</button>
+      <a href="login-seller.html" class="btn btn-accent">🏪 List Your Toys</a>
+      <button class="btn btn-outline" onclick="showPage('membership')">🎫 ₹3,500 Membership</button>
+    </div>
+    <div class="hero-stats">
+      <div><div class="stat-num">4,200+</div><div class="stat-lbl">Toys Listed</div></div>
+      <div><div class="stat-num">12,000+</div><div class="stat-lbl">Happy Families</div></div>
+      <div><div class="stat-num">₹80 avg</div><div class="stat-lbl">Daily Rental</div></div>
+      <div><div class="stat-num">6 Cities</div><div class="stat-lbl">& Growing</div></div>
+    </div>
+  </section>
+
+  <!-- HOW PLATFORM WORKS BANNER -->
+  <div class="platform-banner">
+    <div class="banner-step"><span class="num">1</span> Browse Toys Online</div>
+    <div class="banner-arrow">→</div>
+    <div class="banner-step"><span class="num">2</span> Contact Seller Directly</div>
+    <div class="banner-arrow">→</div>
+    <div class="banner-step"><span class="num">3</span> Arrange Pickup / Drop</div>
+    <div class="banner-arrow">→</div>
+    <div class="banner-step"><span class="num">4</span> Play &amp; Return!</div>
+  </div>
+
+  <!-- CATEGORIES -->
+  <div class="section">
+    <div class="sec-header">
+      <h2 class="sec-title">Shop by <span>Category</span></h2>
+    </div>
+    <div class="cat-grid">
+      <div class="cat-card" onclick="showPage('browse');filterCat('Board Games')"><div class="cat-icon">🎲</div><div class="cat-name">Board Games</div></div>
+      <div class="cat-card" onclick="showPage('browse');filterCat('Building Blocks')"><div class="cat-icon">🧱</div><div class="cat-name">Blocks & LEGO</div></div>
+      <div class="cat-card" onclick="showPage('browse');filterCat('Dolls')"><div class="cat-icon">🪆</div><div class="cat-name">Dolls</div></div>
+      <div class="cat-card" onclick="showPage('browse');filterCat('Cars')"><div class="cat-icon">🚗</div><div class="cat-name">Cars & Vehicles</div></div>
+      <div class="cat-card" onclick="showPage('browse');filterCat('Puzzles')"><div class="cat-icon">🧩</div><div class="cat-name">Puzzles</div></div>
+      <div class="cat-card" onclick="showPage('browse');filterCat('Outdoor')"><div class="cat-icon">⚽</div><div class="cat-name">Outdoor</div></div>
+      <div class="cat-card" onclick="showPage('browse');filterCat('Educational')"><div class="cat-icon">📚</div><div class="cat-name">Educational</div></div>
+      <div class="cat-card" onclick="showPage('browse');filterCat('Electronic')"><div class="cat-icon">🎮</div><div class="cat-name">Electronic</div></div>
+    </div>
+  </div>
+
+  <!-- FEATURED -->
+  <div class="section" style="padding-top:0">
+    <div class="sec-header">
+      <h2 class="sec-title">Featured <span>Listings</span></h2>
+      <button class="btn btn-outline" onclick="showPage('browse')">View All →</button>
+    </div>
+    <div class="toy-grid" id="featuredGrid"></div>
+  </div>
+</div>
+
+<!-- ===== BROWSE ===== -->
+<div class="page" id="page-browse">
+  <div class="section">
+    <h2 class="sec-title" style="margin-bottom:22px">Browse <span>All Toys</span></h2>
+    <div class="search-row">
+      <input type="text" id="searchInput" placeholder="🔍  Search by name, category, age group..." oninput="renderBrowse()"/>
+      <button class="btn btn-primary" onclick="renderBrowse()">Search</button>
+    </div>
+    <div class="filter-bar" id="filterBar">
+      <button class="fbtn active" onclick="setFilter(this,'All')">All</button>
+      <button class="fbtn" onclick="setFilter(this,'Rent')">🕐 For Rent</button>
+      <button class="fbtn" onclick="setFilter(this,'Buy')">🛍️ For Sale</button>
+      <button class="fbtn" onclick="setFilter(this,'Board Games')">🎲 Board Games</button>
+      <button class="fbtn" onclick="setFilter(this,'Building Blocks')">🧱 Blocks</button>
+      <button class="fbtn" onclick="setFilter(this,'Dolls')">🪆 Dolls</button>
+      <button class="fbtn" onclick="setFilter(this,'Cars')">🚗 Cars</button>
+      <button class="fbtn" onclick="setFilter(this,'Puzzles')">🧩 Puzzles</button>
+      <button class="fbtn" onclick="setFilter(this,'Outdoor')">⚽ Outdoor</button>
+      <button class="fbtn" onclick="setFilter(this,'Educational')">📚 Educational</button>
+    </div>
+    <div class="toy-grid" id="browseGrid"></div>
+  </div>
+</div>
+
+<!-- ===== HOW IT WORKS ===== -->
+<div class="page" id="page-how">
+  <div class="section">
+    <h2 class="sec-title" style="margin-bottom:6px">How <span>ToyBox</span> Works</h2>
+    <p style="color:var(--muted);margin-bottom:10px;font-size:0.95rem;">We are a <strong>platform only</strong> — pickup & drop-off is arranged directly between buyer and seller.</p>
+    <div style="background:#fef3c7;border:2px solid #f59e0b;border-radius:14px;padding:14px 18px;margin-bottom:36px;font-size:0.88rem;font-weight:600;color:#92400e;">
+      📦 ToyBox does NOT handle delivery. Once you find a toy, you contact the seller and coordinate pickup/drop yourself.
+    </div>
+    <h3 style="font-family:'Baloo 2',cursive;font-size:1.25rem;margin-bottom:18px;">🕐 Renting a Toy</h3>
+    <div class="how-grid" style="margin-bottom:44px">
+      <div class="how-card"><span class="how-icon">🎫</span><div class="how-step">1</div><div class="how-title">Get Membership</div><div class="how-desc">Pay ₹3,500 membership deposit. This is refundable and protects both parties.</div></div>
+      <div class="how-card"><span class="how-icon">🔍</span><div class="how-step">2</div><div class="how-title">Browse & Find</div><div class="how-desc">Search toys by category, age, city. View photos and details uploaded by sellers.</div></div>
+      <div class="how-card"><span class="how-icon">📞</span><div class="how-step">3</div><div class="how-title">Contact Seller</div><div class="how-desc">Message or call the seller directly through ToyBox. Agree on rental period and price.</div></div>
+      <div class="how-card"><span class="how-icon">🤝</span><div class="how-step">4</div><div class="how-title">Arrange Pickup</div><div class="how-desc">You pick up the toy from the seller's location or they drop it to you — mutually decided.</div></div>
+      <div class="how-card"><span class="how-icon">🧸</span><div class="how-step">5</div><div class="how-title">Play & Enjoy</div><div class="how-desc">Enjoy the toy for the rental duration. Take care — damages are deducted from deposit.</div></div>
+      <div class="how-card"><span class="how-icon">🔄</span><div class="how-step">6</div><div class="how-title">Return on Time</div><div class="how-desc">Return the toy as agreed. Not returning = blacklist. Return on time = all good!</div></div>
+    </div>
+    <h3 style="font-family:'Baloo 2',cursive;font-size:1.25rem;margin-bottom:18px;">🛍️ Buying a Pre-Loved Toy</h3>
+    <div class="how-grid">
+      <div class="how-card"><span class="how-icon">✅</span><div class="how-step">1</div><div class="how-title">Seller Listed</div><div class="how-desc">Seller uploads photos & details. You can see real pictures before deciding.</div></div>
+      <div class="how-card"><span class="how-icon">📞</span><div class="how-step">2</div><div class="how-title">Contact & Negotiate</div><div class="how-desc">Connect with seller, discuss price and condition. No middleman.</div></div>
+      <div class="how-card"><span class="how-icon">🤝</span><div class="how-step">3</div><div class="how-title">Pickup / Meet</div><div class="how-desc">Arrange a mutual meetup or the seller drops it. Decide together.</div></div>
+      <div class="how-card"><span class="how-icon">⭐</span><div class="how-step">4</div><div class="how-title">Rate & Review</div><div class="how-desc">After the transaction, rate the seller to help the community.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MEMBERSHIP ===== -->
+<div class="page" id="page-membership">
+  <div class="membership-section" style="min-height:calc(100vh - 68px)">
+    <div class="mem-inner" style="max-width:1100px;margin:0 auto">
+      <div class="mem-left">
+        <h2>ToyBox <span>Membership</span><br/>& Security Deposit</h2>
+        <p>To keep our platform safe and trustworthy for all families, every buyer pays a one-time refundable membership amount of ₹3,500 before they can rent or contact sellers.</p>
+        <p style="color:var(--muted);line-height:1.7;margin-bottom:24px;">This deposit protects sellers from damage, loss, or non-return. It is fully refundable when you close your account — provided there are no pending deductions.</p>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;align-items:center;gap:12px;font-weight:700;font-size:0.92rem;">
+            <span style="font-size:1.4rem">✅</span> Access to all toy listings & seller contact details
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;font-weight:700;font-size:0.92rem;">
+            <span style="font-size:1.4rem">✅</span> Unlimited rentals and purchases
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;font-weight:700;font-size:0.92rem;">
+            <span style="font-size:1.4rem">✅</span> Priority dispute resolution support
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;font-weight:700;font-size:0.92rem;">
+            <span style="font-size:1.4rem">✅</span> Fully refundable on account closure (no violations)
+          </div>
+        </div>
+        <div style="margin-top:28px;">
+          <a href="login-buyer.html" class="btn btn-primary" style="font-size:1rem;padding:13px 32px;">Join Now — Pay ₹3,500 →</a>
+        </div>
+      </div>
+      <div>
+        <div class="mem-card">
+          <div class="mem-amount">₹3,500</div>
+          <div class="mem-label">One-Time Refundable Membership Deposit</div>
+          <div class="mem-rules">
+            <div class="mem-rule good"><span class="icon">✅</span><span>Toy returned in good condition → Full deposit intact, no deductions.</span></div>
+            <div class="mem-rule warn"><span class="icon">⚠️</span><span>Toy returned with damage → Repair cost deducted from your ₹3,500 deposit.</span></div>
+            <div class="mem-rule warn"><span class="icon">🔄</span><span>Wrong / incorrect toy received → Seller's listing removed and amount deducted from seller's account.</span></div>
+            <div class="mem-rule bad"><span class="icon">❌</span><span>Toy NOT returned after rental period → Your account is <strong>permanently blacklisted</strong> and full deposit is forfeited.</span></div>
+            <div class="mem-rule bad"><span class="icon">🚫</span><span>Repeated violations or fraud → Permanent ban + legal action as applicable.</span></div>
+            <div class="mem-rule good"><span class="icon">💰</span><span>Account closure with no violations → Full ₹3,500 refunded within 7 working days.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PROFILE ===== -->
+<div class="page" id="page-profile">
+  <!-- NOT LOGGED IN STATE -->
+  <div id="profileGuest" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;padding:40px;text-align:center;">
+    <div style="font-size:4rem;margin-bottom:16px;">👤</div>
+    <div style="font-size:1.5rem;font-weight:700;margin-bottom:8px;">My Account</div>
+    <div style="color:var(--muted);margin-bottom:28px;">Login to view your dashboard, rentals, and deposit balance</div>
+    <a href="login-buyer.html" class="btn btn-primary" style="font-size:1rem;padding:13px 32px;">🔐 Login / Sign Up</a>
+  </div>
+
+  <!-- LOGGED IN STATE -->
+  <div id="profileDash" style="display:none;">
+    <div class="profile-hero">
+      <div class="avatar" id="buyerAvatar">👤</div>
+      <div class="profile-name" id="profileName">Loading...</div>
+      <div style="opacity:.8;font-size:0.88rem" id="profileEmail"></div>
+      <button onclick="logoutBuyer()" style="margin-top:12px;background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.4);color:#fff;padding:7px 20px;border-radius:20px;cursor:pointer;font-size:.85rem;">Logout</button>
+    </div>
+    <div class="profile-body">
+
+      <!-- MEMBERSHIP STATUS CARD -->
+      <div class="mem-status-card" id="membershipCard">
+        <div><div class="label">Membership Status</div><div class="val" id="memStatus">Checking...</div></div>
+        <div style="text-align:right"><div class="label">Deposit Balance</div><div class="val" id="depositBal">—</div></div>
+      </div>
+
+      <!-- PAY MEMBERSHIP BUTTON (shown if not paid) -->
+      <div id="payMemSection" style="display:none;background:#fef3c7;border:2px solid #f59e0b;border-radius:14px;padding:20px;margin-bottom:16px;text-align:center;">
+        <div style="font-size:1.1rem;font-weight:700;margin-bottom:6px;">💳 Unlock Full Access</div>
+        <div style="font-size:.88rem;color:#666;margin-bottom:16px;">Pay ₹3,500 refundable deposit to contact sellers and rent toys</div>
+        <button class="btn btn-primary" onclick="payMembershipDash()" style="width:100%;max-width:320px;">Pay ₹3,500 Membership Deposit</button>
+      </div>
+
+      <!-- ACTIVE RENTALS -->
+      <div class="pcard">
+        <h3>🕐 My Rentals</h3>
+        <div id="rentalsList"><div style="color:var(--muted);padding:16px;text-align:center;">Loading...</div></div>
+      </div>
+
+      <!-- DEPOSIT HISTORY -->
+      <div class="pcard">
+        <h3>💰 Deposit History</h3>
+        <div id="depositList"><div style="color:var(--muted);padding:16px;text-align:center;">Loading...</div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- TOY DETAIL MODAL -->
+<div class="modal-overlay" id="toyModal" onclick="closeModalOverlay(event)">
+  <div class="modal">
+    <div class="photo-gallery" id="photoGallery">
+      <div class="gallery-slides" id="gallerySlides"></div>
+      <button class="gallery-prev" id="galleryPrev" onclick="galleryMove(-1)" style="display:none">‹</button>
+      <button class="gallery-next" id="galleryNext" onclick="galleryMove(1)" style="display:none">›</button>
+      <div class="gallery-dots" id="galleryDots"></div>
+      <div class="gallery-count" id="galleryCount" style="display:none"></div>
+      <button class="modal-close" onclick="closeModal()" style="position:absolute;top:12px;right:12px;z-index:10;background:rgba(255,255,255,.9);border:none;cursor:pointer;width:36px;height:36px;border-radius:50%;font-size:1rem;">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap" id="modalBadges"></div>
+      <div class="modal-title" id="modalTitle"></div>
+      <div class="modal-seller" id="modalSeller"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px" id="modalPrices"></div>
+      <div style="font-size:0.88rem;color:var(--muted);line-height:1.7;margin-bottom:4px" id="modalDesc"></div>
+      <div class="contact-box">
+        <h4>📞 How to Get This Toy</h4>
+        <div class="contact-steps">
+          <div class="contact-step"><span class="c-num">1</span> Login / register and pay ₹3,500 membership</div>
+          <div class="contact-step"><span class="c-num">2</span> View seller's contact details on the listing</div>
+          <div class="contact-step"><span class="c-num">3</span> Call or message the seller directly</div>
+          <div class="contact-step"><span class="c-num">4</span> Agree on pickup time & location mutually</div>
+          <div class="contact-step"><span class="c-num">5</span> Pick up the toy &amp; enjoy!</div>
+        </div>
+        <div class="deposit-note">⚠️ Reminder: ₹3,500 membership deposit is required. Damage, non-return, or wrong product claims will be deducted from this deposit.</div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:4px">
+        <button class="btn btn-primary" id="contactBtn" onclick="handleContactSeller()" style="flex:1;justify-content:center">🔐 Login to Contact Seller</button>
+        <button class="btn btn-outline" onclick="closeModal()" style="padding:9px 20px">Close</button>
+      </div>
+      <div id="membershipPayBox" style="display:none;margin-top:12px;background:#fef3c7;border:2px solid #f59e0b;border-radius:12px;padding:16px;">
+        <div style="font-weight:700;margin-bottom:6px;">💳 Pay ₹3,500 Membership Deposit</div>
+        <div style="font-size:.88rem;color:#666;margin-bottom:12px;">You are logged in but need to pay the membership deposit to contact sellers. This is fully refundable.</div>
+        <button class="btn btn-primary" onclick="payMembership()" style="width:100%;">Pay ₹3,500 & Unlock Seller Contact</button>
+      </div>
+      <div id="sellerContactBox" style="display:none;margin-top:12px;background:#dcfce7;border:2px solid #16a34a;border-radius:12px;padding:16px;">
+        <div style="font-weight:700;color:#166534;margin-bottom:8px;">✅ Seller Contact Details</div>
+        <div id="sellerContactDetails" style="font-size:.95rem;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-logo">🧸 Toy<span>Box</span></div>
+      <p class="footer-desc">A peer-to-peer toy marketplace connecting families across India. We are a platform — pickup & drop is arranged directly between buyers and sellers.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Platform</h4>
+      <a onclick="showPage('browse')">Browse Toys</a>
+      <a href="login-seller.html">List a Toy</a>
+      <a onclick="showPage('how')">How It Works</a>
+      <a onclick="showPage('membership')">Membership</a>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <a>Help Center</a>
+      <a>Report a Problem</a>
+      <a>Dispute Resolution</a>
+      <a>Contact Us</a>
+    </div>
+    <div class="footer-col">
+      <h4>Legal</h4>
+      <a>About Us</a>
+      <a>Terms of Service</a>
+      <a>Privacy Policy</a>
+      <a>Refund Policy</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 ToyBox. All rights reserved.</span>
+    <span>🌱 Sustainable · Affordable · Community-Driven</span>
+  </div>
+</footer>
+
+<script>
+const toys = [
+  {id:1,name:"LEGO Classic Set",img:"https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=400&h=300&fit=crop",cat:"Building Blocks",age:"5-12",cond:"Like New",rent:120,buy:699,type:"both",bg:"#FFF3E0",seller:"Priya Mehta",city:"Mumbai",desc:"Complete LEGO Classic set with 500+ pieces. All parts present, box in great condition."},
+  {id:2,name:"Monopoly Junior",img:"https://images.unsplash.com/photo-1611996575749-79a3a250f948?w=400&h=300&fit=crop",cat:"Board Games",age:"5-8",cond:"Good",rent:80,buy:399,type:"both",bg:"#E8F5E9",seller:"Rahul Shah",city:"Pune",desc:"Monopoly Junior with all cards, tokens and board intact. Minor wear on box edges only."},
+  {id:3,name:"Barbie Dreamhouse Set",img:"https://images.unsplash.com/photo-1575783970733-1aaedde1db74?w=400&h=300&fit=crop",cat:"Dolls",age:"3-10",cond:"Like New",rent:150,buy:null,type:"rent",bg:"#FCE4EC",seller:"Anita Verma",city:"Bangalore",desc:"Full Barbie set with furniture and accessories. No missing parts. Sanitized and ready."},
+  {id:4,name:"Hot Wheels 20-Pack",img:"https://images.unsplash.com/photo-1594787318286-3d835c1d207f?w=400&h=300&fit=crop",cat:"Cars",age:"3-10",cond:"Good",rent:null,buy:349,type:"buy",bg:"#E3F2FD",seller:"Vijay Kumar",city:"Delhi",desc:"20 Hot Wheels cars in great condition. A few have minor paint wear but all wheels spin."},
+  {id:5,name:"Ravensburger Puzzle",img:"https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?w=400&h=300&fit=crop",cat:"Puzzles",age:"6-12",cond:"Excellent",rent:60,buy:249,type:"both",bg:"#F3E5F5",seller:"Sneha Rao",city:"Hyderabad",desc:"100-piece puzzle with all pieces intact. Verified complete. Beautiful dinosaur theme."},
+  {id:6,name:"Cricket Set Junior",img:"https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=400&h=300&fit=crop",cat:"Outdoor",age:"6-14",cond:"Good",rent:100,buy:499,type:"both",bg:"#E0F7FA",seller:"Arjun Nair",city:"Chennai",desc:"Junior cricket set with bat, ball, stumps and bails. Great for outdoor play."},
+  {id:7,name:"Play-Doh Mega Kit",img:"https://images.unsplash.com/photo-1615461066841-6116e61058f4?w=400&h=300&fit=crop",cat:"Educational",age:"3-8",cond:"Like New",rent:70,buy:299,type:"both",bg:"#FFF9C4",seller:"Deepa Singh",city:"Mumbai",desc:"Play-Doh mega kit with 20 colors and 15 tools. All colors are sealed and unused."},
+  {id:8,name:"Uno Card Game",img:"https://images.unsplash.com/photo-1585504198199-20277593b94f?w=400&h=300&fit=crop",cat:"Board Games",age:"7+",cond:"Good",rent:40,buy:149,type:"both",bg:"#FFEBEE",seller:"Karan Patel",city:"Ahmedabad",desc:"Complete Uno deck with 108 cards. Cards have minor shuffle wear but fully playable."},
+  {id:9,name:"RC Racing Car",img:"https://images.unsplash.com/photo-1581235720704-06d3acfeb31a?w=400&h=300&fit=crop",cat:"Cars",age:"6-14",cond:"Excellent",rent:180,buy:899,type:"both",bg:"#E8EAF6",seller:"Rohit Gupta",city:"Pune",desc:"Remote control racing car with 2.4GHz remote. Charges in 1 hour, runs for 45 mins."},
+  {id:10,name:"Wooden Nesting Dolls",img:"https://images.unsplash.com/photo-1516981879613-9f5da904015f?w=400&h=300&fit=crop",cat:"Dolls",age:"2-6",cond:"Like New",rent:90,buy:199,type:"both",bg:"#FBE9E7",seller:"Meena Joshi",city:"Jaipur",desc:"Set of 7 hand-painted wooden nesting dolls. No chips or cracks. Great decorative toy."},
+  {id:11,name:"Alphabet Learning Board",img:"https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&h=300&fit=crop",cat:"Educational",age:"2-5",cond:"Excellent",rent:50,buy:199,type:"both",bg:"#E0F2F1",seller:"Sunita Das",city:"Kolkata",desc:"Interactive alphabet board with letter sounds. All buttons work. Battery included."},
+  {id:12,name:"3D Puzzle Globe",img:"https://images.unsplash.com/photo-1569317002804-ab77bcf1bce4?w=400&h=300&fit=crop",cat:"Puzzles",age:"10+",cond:"Like New",rent:90,buy:449,type:"both",bg:"#EDE7F6",seller:"Amit Sharma",city:"Delhi",desc:"540-piece 3D globe puzzle. Complete set, all pieces present. Educational and fun."},
+];
+
+let activeFilter = 'All';
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function setActive(el) {
+  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+  el.classList.add('active');
+}
+function setActiveNav(name) {
+  document.querySelectorAll('.nav-links a').forEach(a=>{
+    if(a.textContent.trim()===name) a.classList.add('active');
+    else a.classList.remove('active');
+  });
+}
+function setFilter(btn, val) {
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  activeFilter = val;
+  renderBrowse();
+}
+function filterCat(cat) {
+  activeFilter = cat;
+  renderBrowse();
+}
+function toyCard(t) {
+  const badge = t.type==='rent'?'<span class="type-badge badge-rent">For Rent</span>':t.type==='buy'?'<span class="type-badge badge-buy">For Sale</span>':'<span class="type-badge badge-both">Rent & Buy</span>';
+  const rp = t.rent?`<span class="price-chip price-rent">🕐 ₹${t.rent}/day</span>`:'';
+  const bp = t.buy?`<span class="price-chip price-buy">🛍️ ₹${t.buy}</span>`:'';
+  const rb = t.rent?`<button class="btn btn-accent" onclick="openToyModal(${t.id})">Rent</button>`:'';
+  const bb = t.buy?`<button class="btn btn-purple" onclick="openToyModal(${t.id})">Buy</button>`:'';
+  return `<div class="toy-card">
+    <div class="toy-img" style="background:${t.bg||'#f5f0e8'};overflow:hidden;">${badge}<span class="cond-badge">⭐ ${t.cond||t.condition_tag}</span>
+      ${t.img
+        ? `<img src="${t.img}" alt="${t.name}" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;" onerror="this.style.display='none'">`
+        : `<div class="no-photo"><span style="font-size:2.5rem">🧸</span><span>No photo yet</span></div>`}
+    </div>
+    <div class="toy-body">
+      <div class="toy-name">${t.name}</div>
+      <div class="seller-name">🏪 ${t.seller} · 📍 ${t.city}</div>
+      <div class="toy-meta"><span class="toy-age">👶 ${t.age} yrs</span>${t.cat}</div>
+      <div class="toy-price-row">${rp}${bp}</div>
+      <div class="toy-actions">${rb}${bb}</div>
+    </div>
+  </div>`;
+}
+function renderFeatured() {
+  document.getElementById('featuredGrid').innerHTML = toys.slice(0,4).map(toyCard).join('');
+}
+function renderBrowse() {
+  const q = (document.getElementById('searchInput')?.value||'').toLowerCase();
+  const filtered = toys.filter(t=>{
+    const ms = !q||t.name.toLowerCase().includes(q)||t.cat.toLowerCase().includes(q)||t.city.toLowerCase().includes(q);
+    const mf = activeFilter==='All'||(activeFilter==='Rent'&&t.rent)||(activeFilter==='Buy'&&t.buy)||t.cat===activeFilter;
+    return ms&&mf;
+  });
+  document.getElementById('browseGrid').innerHTML = filtered.length
+    ? filtered.map(toyCard).join('')
+    : '<p style="color:var(--muted);grid-column:1/-1;text-align:center;padding:48px">No toys found. Try a different search!</p>';
+}
+
+// ── BUYER DASHBOARD ───────────────────────────────────
+function initBuyerDash() {
+  const token = localStorage.getItem('buyerToken');
+  const buyer = JSON.parse(localStorage.getItem('buyerData') || 'null');
+
+  if (!token || !buyer) {
+    document.getElementById('profileGuest').style.display = 'flex';
+    document.getElementById('profileDash').style.display  = 'none';
+    return;
+  }
+
+  document.getElementById('profileGuest').style.display = 'none';
+  document.getElementById('profileDash').style.display  = 'block';
+
+  // Set name/email
+  document.getElementById('profileName').textContent  = buyer.name || 'Buyer';
+  document.getElementById('profileEmail').textContent = buyer.email || '';
+  document.getElementById('buyerAvatar').textContent  = (buyer.name||'B')[0].toUpperCase();
+
+  // Membership status
+  if (buyer.membership_paid) {
+    document.getElementById('memStatus').innerHTML  = 'Active ✅';
+    document.getElementById('depositBal').textContent = '₹' + Number(buyer.deposit_balance||3500).toLocaleString();
+    document.getElementById('payMemSection').style.display = 'none';
+  } else {
+    document.getElementById('memStatus').innerHTML  = 'Not Paid ❌';
+    document.getElementById('depositBal').textContent = '₹0';
+    document.getElementById('payMemSection').style.display = 'block';
+  }
+
+  // Load rentals and deposit history from API
+  loadBuyerRentals(token);
+  loadDepositHistory(token);
+}
+
+async function loadBuyerRentals(token) {
+  const el = document.getElementById('rentalsList');
+  try {
+    const res  = await fetch('/api/buyers/rentals', { headers: { 'Authorization': 'Bearer ' + token } });
+    const data = await res.json();
+    if (!data.length) {
+      el.innerHTML = '<div style="color:var(--muted);padding:16px;text-align:center;">No rentals yet — browse toys and contact a seller!</div>';
+      return;
+    }
+    el.innerHTML = data.map(r => `
+      <div class="order-row">
+        <div class="order-emoji">🧸</div>
+        <div class="order-info">
+          <div class="order-name">${r.toy_name}</div>
+          <div class="order-detail">${r.store_name} · Due: ${new Date(r.due_date).toLocaleDateString('en-IN')} · ₹${r.rent_per_day}/day</div>
+        </div>
+        <span class="status ${r.status==='active'?'s-active':'s-done'}">${r.status}</span>
+      </div>`).join('');
+  } catch(e) {
+    el.innerHTML = '<div style="color:var(--muted);padding:16px;text-align:center;">Could not load rentals</div>';
+  }
+}
+
+async function loadDepositHistory(token) {
+  const el = document.getElementById('depositList');
+  try {
+    const res  = await fetch('/api/buyers/deposit-history', { headers: { 'Authorization': 'Bearer ' + token } });
+    const data = await res.json();
+    if (!data.length) {
+      el.innerHTML = '<div style="color:var(--muted);padding:16px;text-align:center;">No deposit transactions yet</div>';
+      return;
+    }
+    el.innerHTML = data.map(d => `
+      <div class="order-row">
+        <div class="order-emoji">${d.amount > 0 ? '💚' : '🔴'}</div>
+        <div class="order-info">
+          <div class="order-name">${d.type.replace(/_/g,' ')}</div>
+          <div class="order-detail">${d.reason||''} · ${new Date(d.created_at).toLocaleDateString('en-IN')}</div>
+        </div>
+        <span style="font-weight:700;color:${d.amount>0?'#16a34a':'#dc2626'}">${d.amount>0?'+':''} ₹${Math.abs(d.amount)}</span>
+      </div>`).join('');
+  } catch(e) {
+    el.innerHTML = '<div style="color:var(--muted);padding:16px;text-align:center;">Could not load history</div>';
+  }
+}
+
+async function payMembershipDash() {
+  const token = localStorage.getItem('buyerToken');
+  const btn = document.querySelector('#payMemSection button');
+  btn.disabled = true; btn.textContent = 'Processing...';
+  try {
+    const res  = await fetch('/api/buyers/pay-membership', { method:'POST', headers:{'Authorization':'Bearer '+token} });
+    const data = await res.json();
+    if (!res.ok) { alert(data.error||'Failed'); btn.disabled=false; btn.textContent='Pay ₹3,500 Membership Deposit'; return; }
+    const buyer = JSON.parse(localStorage.getItem('buyerData')||'{}');
+    buyer.membership_paid = true; buyer.deposit_balance = 3500;
+    localStorage.setItem('buyerData', JSON.stringify(buyer));
+    document.getElementById('memStatus').innerHTML   = 'Active ✅';
+    document.getElementById('depositBal').textContent = '₹3,500';
+    document.getElementById('payMemSection').style.display = 'none';
+    loadDepositHistory(token);
+    showToast('✅ Membership activated! You can now contact sellers.');
+  } catch(e) { alert('Cannot connect to server.'); btn.disabled=false; btn.textContent='Pay ₹3,500 Membership Deposit'; }
+}
+
+function logoutBuyer() {
+  localStorage.removeItem('buyerToken');
+  localStorage.removeItem('buyerData');
+  document.getElementById('profileGuest').style.display = 'flex';
+  document.getElementById('profileDash').style.display  = 'none';
+  showToast('👋 Logged out successfully');
+}
+
+// ── CURRENT LISTING TRACKER ──────────────────────────
+let currentListingId = null;
+let _galleryIdx = 0;
+let _galleryPhotos = [];
+
+async function openToyModal(id) {
+  currentListingId = id;
+  document.getElementById('membershipPayBox').style.display = 'none';
+  document.getElementById('sellerContactBox').style.display = 'none';
+  const btn = document.getElementById('contactBtn');
+  btn.style.display = '';
+
+  const t = toys.find(x=>x.id===id) || {};
+  document.getElementById('modalTitle').textContent = t.name||'';
+  document.getElementById('modalSeller').innerHTML = `Listed by <strong>${t.store_name||t.seller||''}</strong> · 📍 ${t.city||''} · ⭐ ${t.condition_tag||t.cond||''}`;
+  const badge = (t.listing_type||t.type)==='rent'?'<span class="type-badge badge-rent" style="position:static">For Rent</span>':(t.listing_type||t.type)==='buy'?'<span class="type-badge badge-buy" style="position:static">For Sale</span>':'<span class="type-badge badge-both" style="position:static">Rent & Buy</span>';
+  document.getElementById('modalBadges').innerHTML = badge + `<span class="toy-age">👶 Age ${t.age_group||t.age||''}</span>`;
+  const rp = (t.rent_price||t.rent) ? `<span class="price-chip price-rent" style="font-size:.9rem">🕐 ₹${t.rent_price||t.rent}/day rental</span>` : '';
+  const bp = (t.buy_price||t.buy)   ? `<span class="price-chip price-buy"  style="font-size:.9rem">🛍️ Buy for ₹${t.buy_price||t.buy}</span>` : '';
+  document.getElementById('modalPrices').innerHTML = rp+bp;
+  document.getElementById('modalDesc').textContent = t.desc||t.description||'';
+  document.getElementById('toyModal').classList.add('active');
+
+  // Set button text
+  const buyer = JSON.parse(localStorage.getItem('buyerData')||'null');
+  btn.textContent = !buyer ? '🔐 Login to Contact Seller' : !buyer.membership_paid ? '💳 Pay ₹3,500 to Contact Seller' : '📞 View Seller Contact';
+
+  // Load real photos from API
+  _galleryPhotos = [];
+  _galleryIdx = 0;
+  try {
+    const res  = await fetch('/api/listings/' + id);
+    const data = await res.json();
+    if (data.images && data.images.length) {
+      _galleryPhotos = data.images.map(img => '/uploads/' + img.filename);
+    } else if (t.img) {
+      _galleryPhotos = [t.img];
+    }
+  } catch(e) {
+    if (t.img) _galleryPhotos = [t.img];
+  }
+  renderGallery();
+}
+
+function renderGallery() {
+  const slides = document.getElementById('gallerySlides');
+  const dots   = document.getElementById('galleryDots');
+  const prev   = document.getElementById('galleryPrev');
+  const next   = document.getElementById('galleryNext');
+  const count  = document.getElementById('galleryCount');
+
+  if (!_galleryPhotos.length) {
+    slides.innerHTML = '<div class="gallery-slide no-img">📷</div>';
+    dots.innerHTML = ''; prev.style.display='none'; next.style.display='none'; count.style.display='none';
+    return;
+  }
+
+  slides.innerHTML = _galleryPhotos.map(src =>
+    `<img class="gallery-slide" src="${src}" alt="toy photo" onerror="this.src='';this.style.display='none'">`
+  ).join('');
+  slides.style.transform = 'translateX(0)';
+
+  if (_galleryPhotos.length > 1) {
+    dots.innerHTML = _galleryPhotos.map((_,i) => `<div class="gallery-dot ${i===0?'active':''}" onclick="galleryGo(${i})"></div>`).join('');
+    prev.style.display='flex'; next.style.display='flex';
+    count.style.display='block';
+    count.textContent = '1 / ' + _galleryPhotos.length;
+  } else {
+    dots.innerHTML=''; prev.style.display='none'; next.style.display='none'; count.style.display='none';
+  }
+}
+
+function galleryMove(dir) {
+  _galleryIdx = (_galleryIdx + dir + _galleryPhotos.length) % _galleryPhotos.length;
+  galleryGo(_galleryIdx);
+}
+
+function galleryGo(idx) {
+  _galleryIdx = idx;
+  document.getElementById('gallerySlides').style.transform = `translateX(-${idx*100}%)`;
+  document.querySelectorAll('.gallery-dot').forEach((d,i) => d.classList.toggle('active', i===idx));
+  document.getElementById('galleryCount').textContent = (idx+1) + ' / ' + _galleryPhotos.length;
+}
+
+function handleContactSeller() {
+  const token = localStorage.getItem('buyerToken');
+  const buyer = JSON.parse(localStorage.getItem('buyerData')||'null');
+  if (!token || !buyer) { window.location.href = 'login-buyer.html'; return; }
+  if (!buyer.membership_paid) {
+    document.getElementById('membershipPayBox').style.display = 'block';
+    document.getElementById('contactBtn').style.display = 'none';
+    return;
+  }
+  showSellerContact();
+}
+
+async function payMembership() {
+  const token = localStorage.getItem('buyerToken');
+  const btn = document.querySelector('#membershipPayBox button');
+  btn.disabled = true; btn.textContent = 'Processing...';
+  try {
+    const res = await fetch('/api/buyers/pay-membership', {
+      method:'POST', headers:{'Authorization':'Bearer '+token}
+    });
+    const data = await res.json();
+    if (!res.ok) { alert(data.error||'Payment failed.'); btn.disabled=false; btn.textContent='Pay ₹3,500 & Unlock Seller Contact'; return; }
+    const buyer = JSON.parse(localStorage.getItem('buyerData')||'{}');
+    buyer.membership_paid = true; buyer.deposit_balance = 3500;
+    localStorage.setItem('buyerData', JSON.stringify(buyer));
+    document.getElementById('membershipPayBox').style.display = 'none';
+    showSellerContact();
+  } catch(e) { alert('Cannot connect to server.'); btn.disabled=false; btn.textContent='Pay ₹3,500 & Unlock Seller Contact'; }
+}
+
+async function showSellerContact() {
+  document.getElementById('sellerContactBox').style.display = 'block';
+  document.getElementById('contactBtn').style.display = 'none';
+  const details = document.getElementById('sellerContactDetails');
+  details.innerHTML = 'Loading...';
+  try {
+    const res  = await fetch('/api/listings/' + currentListingId);
+    const data = await res.json();
+    details.innerHTML = `
+      <div style="margin-bottom:6px;">🏪 <strong>${data.store_name||'Seller'}</strong></div>
+      <div style="margin-bottom:6px;">📞 <strong style="font-size:1.1rem">${data.seller_mobile||'Contact via ToyBox'}</strong></div>
+      <div style="margin-bottom:6px;">📍 ${data.city}${data.area?', '+data.area:''}</div>
+      ${data.pickup_note?'<div style="margin-top:8px;font-size:.85rem;color:#555;">📝 '+data.pickup_note+'</div>':''}`;
+  } catch(e) { details.innerHTML = '<div style="color:#f00">Could not load seller details.</div>'; }
+}
+
+function closeModal() { document.getElementById('toyModal').classList.remove('active'); }
+function closeModalOverlay(e) { if(e.target.id==='toyModal') closeModal(); }
+function showToast(msg) {
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+// ── LOAD REAL LISTINGS FROM API ───────────────────────
+async function loadRealListings() {
+  try {
+    const res = await fetch('/api/listings');
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data || !data.length) return;
+    const apiToys = data.map(l => ({
+      id: l.id, name: l.name, emoji: '🧸', cat: l.category,
+      age: l.age_group, age_group: l.age_group, cond: l.condition_tag,
+      condition_tag: l.condition_tag, rent: l.rent_price, buy: l.buy_price,
+      rent_price: l.rent_price, buy_price: l.buy_price,
+      type: l.listing_type, bg: '#FFF9F0',
+      seller: l.store_name||'ToyBox Seller', store_name: l.store_name,
+      city: l.city, area: l.area, desc: l.description,
+      description: l.description, pickup_note: l.pickup_note,
+      seller_mobile: l.seller_mobile, img: l.primary_image?'/uploads/'+l.primary_image:null
+    }));
+    toys.length = 0;
+    apiToys.forEach(t => toys.push(t));
+    renderFeatured(); renderBrowse();
+  } catch(e) {}
+}
+
+renderFeatured(); renderBrowse();
+loadRealListings();
+</script>
+</body>
+</html>

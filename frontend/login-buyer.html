@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ToyBox — Buyer Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#FFF9F0; --primary:#FF6B35; --pd:#e05520; --sec:#FFD166;
+      --acc:#06D6A0; --purple:#7B5EA7; --dark:#2D2A32; --muted:#8A8490;
+      --card:#fff; --border:#EEE8E0; --err:#ef4444; --ok:#06D6A0;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Nunito',sans-serif;background:var(--bg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+
+    /* ── CARD ── */
+    .wrap{display:flex;width:100%;max-width:960px;min-height:610px;border-radius:28px;overflow:hidden;box-shadow:0 24px 64px rgba(45,42,50,.18);}
+
+    /* ── LEFT PANEL ── */
+    .left{flex:1;background:linear-gradient(150deg,#FF6B35 0%,#f9a03f 60%,#FFD166 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:44px 30px;text-align:center;color:#fff;gap:0;}
+    .big-e{font-size:5rem;animation:bob 2.4s ease-in-out infinite;}
+    @keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg);}50%{transform:translateY(-14px) rotate(4deg);}}
+    .left h2{font-family:'Baloo 2',cursive;font-size:1.85rem;font-weight:800;margin:14px 0 8px;}
+    .left p{font-size:.87rem;opacity:.9;line-height:1.7;margin-bottom:18px;}
+    .perks{width:100%;display:flex;flex-direction:column;gap:8px;}
+    .perk{background:rgba(255,255,255,.2);border-radius:12px;padding:9px 13px;font-size:.83rem;font-weight:700;display:flex;align-items:center;gap:8px;text-align:left;}
+    .notice{background:rgba(255,255,255,.22);border-radius:13px;padding:11px 14px;margin-top:14px;font-size:.78rem;font-weight:700;line-height:1.6;}
+    .sw{margin-top:14px;font-size:.79rem;opacity:.88;}
+    .sw a{color:#fff;font-weight:800;text-decoration:underline;}
+
+    /* ── RIGHT PANEL ── */
+    .right{flex:1.25;background:var(--card);padding:36px 44px;display:flex;flex-direction:column;justify-content:flex-start;overflow-y:auto;max-height:100vh;}
+    .logo{font-family:'Baloo 2',cursive;font-size:1.5rem;font-weight:800;color:var(--primary);}
+    .logo span{color:var(--purple);}
+    .sub-txt{font-size:.8rem;color:var(--muted);margin-bottom:18px;margin-top:2px;}
+
+    /* ── TABS ── */
+    .tabs{display:flex;background:var(--bg);border-radius:50px;padding:4px;margin-bottom:18px;}
+    .tab{flex:1;text-align:center;padding:8px;border-radius:50px;cursor:pointer;font-weight:800;font-size:.85rem;border:none;background:transparent;font-family:'Nunito',sans-serif;transition:all .25s;color:var(--muted);}
+    .tab.on{background:var(--primary);color:#fff;}
+    .fs{display:none;}.fs.on{display:block;}
+
+    /* ── FORM ELEMENTS ── */
+    .fg{margin-bottom:11px;}
+    .fg label{display:block;font-weight:700;font-size:.78rem;margin-bottom:4px;color:var(--dark);}
+    .req{color:var(--err);}
+    .hint{font-size:.69rem;color:var(--muted);font-weight:600;margin-left:4px;}
+    .iw{position:relative;}
+    .pfx{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-weight:800;font-size:.85rem;color:var(--muted);pointer-events:none;z-index:2;}
+    input,select{width:100%;padding:10px 36px 10px 13px;border:2px solid var(--border);border-radius:12px;font-family:'Nunito',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s,background .2s;background:var(--bg);color:var(--dark);}
+    input.pfx-in{padding-left:46px;}
+    input:focus,select:focus{border-color:var(--primary);background:#fff;}
+    input.v-ok{border-color:var(--ok)!important;}
+    input.v-err{border-color:var(--err)!important;}
+    .ico{position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:.88rem;pointer-events:none;}
+    .emsg{font-size:.7rem;color:var(--err);font-weight:700;margin-top:3px;display:none;}
+    .emsg.show{display:block;}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+    /* ── BUTTONS ── */
+    .sbtn{width:100%;padding:12px;background:var(--primary);color:#fff;border:none;border-radius:50px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.95rem;cursor:pointer;transition:all .2s;margin-bottom:11px;}
+    .sbtn:hover{background:var(--pd);transform:translateY(-2px);}
+    .forgot{text-align:right;font-size:.74rem;color:var(--primary);font-weight:700;cursor:pointer;margin-top:-4px;margin-bottom:11px;}
+    .divider{text-align:center;color:var(--muted);font-size:.74rem;margin-bottom:10px;position:relative;}
+    .divider::before,.divider::after{content:'';position:absolute;top:50%;width:35%;height:1px;background:var(--border);}
+    .divider::before{left:0;}.divider::after{right:0;}
+    .soc{display:flex;gap:8px;}
+    .soc-btn{flex:1;padding:9px;border:2px solid var(--border);border-radius:11px;background:#fff;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:.8rem;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px;}
+    .soc-btn:hover{border-color:var(--primary);}
+
+    /* ── STEP BAR ── */
+    .step-bar{display:flex;align-items:flex-start;margin-bottom:16px;}
+    .stp{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;}
+    .stp-c{width:27px;height:27px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.74rem;color:var(--muted);transition:all .35s;}
+    .stp-c.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+    .stp-c.done{background:var(--ok);border-color:var(--ok);color:#fff;}
+    .stp-l{font-size:.67rem;font-weight:700;color:var(--muted);}
+    .stp-line{flex:1;height:2px;background:var(--border);margin-top:13px;transition:background .35s;}
+    .stp-line.done{background:var(--ok);}
+
+    /* ── DEPOSIT INFO ── */
+    .dep-info{background:#fff7ed;border:2px solid #f59e0b;border-radius:11px;padding:9px 12px;font-size:.76rem;font-weight:600;color:#92400e;margin-bottom:11px;display:flex;gap:6px;line-height:1.5;}
+
+    /* ── TERMS ROW ── */
+    .t-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:11px;font-size:.77rem;color:var(--muted);}
+    .t-row input{width:15px;height:15px;margin-top:2px;accent-color:var(--primary);flex-shrink:0;padding:0;border:none;background:none;}
+    .t-row a{color:var(--primary);font-weight:700;text-decoration:none;}
+
+    /* ── PASSWORD STRENGTH ── */
+    .ps-bar{display:flex;gap:3px;margin-top:5px;}
+    .ps-seg{flex:1;height:4px;border-radius:4px;background:#e5e7eb;transition:background .3s;}
+
+    /* ── OTP BOX ── */
+    .otp-box{background:var(--bg);border-radius:16px;padding:20px;border:2px solid var(--border);margin-bottom:12px;}
+    .otp-box h4{font-family:'Baloo 2',cursive;font-size:.96rem;font-weight:800;margin-bottom:5px;}
+    .otp-box p{font-size:.78rem;color:var(--muted);margin-bottom:14px;line-height:1.5;}
+    .otp-digits{display:flex;gap:7px;margin-bottom:10px;}
+    .otp-digits input{padding:13px 0;text-align:center;border-radius:11px;background:#fff;font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:800;color:var(--dark);}
+    .otp-digits input:focus{border-color:var(--primary);}
+    .otp-digits input.filled{border-color:var(--ok);background:#edfaf5;}
+    .resend-row{display:flex;align-items:center;justify-content:space-between;font-size:.73rem;color:var(--muted);}
+    .resend-row a{color:var(--primary);font-weight:800;cursor:pointer;}
+    .vbtn{width:100%;padding:11px;background:var(--acc);color:#fff;border:none;border-radius:50px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.9rem;cursor:pointer;transition:all .2s;margin-top:11px;}
+    .vbtn:hover{background:#04c48e;}
+    .back-link{background:none;border:none;color:var(--muted);font-family:'Nunito',sans-serif;font-weight:700;font-size:.79rem;cursor:pointer;margin-top:4px;}
+
+    /* ── SUCCESS ── */
+    .success-sc{text-align:center;padding:20px 0;}
+    .success-sc .big{font-size:4rem;margin-bottom:12px;}
+    .success-sc h3{font-family:'Baloo 2',cursive;font-size:1.35rem;font-weight:800;margin-bottom:8px;}
+    .success-sc p{color:var(--muted);font-size:.85rem;line-height:1.6;margin-bottom:18px;}
+
+    /* ── TOAST ── */
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(90px);padding:10px 22px;border-radius:50px;font-weight:700;font-size:.83rem;z-index:600;transition:transform .3s;white-space:nowrap;}
+    .toast.show{transform:translateX(-50%) translateY(0);}
+    .toast.success{background:var(--ok);color:#fff;}
+    .toast.error{background:var(--err);color:#fff;}
+    .toast.info{background:var(--dark);color:#fff;}
+
+    @media(max-width:680px){.left{display:none;}.right{padding:28px 18px;}.row2{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ══ LEFT ══ -->
+  <div class="left">
+    <div class="big-e">🧸</div>
+    <h2>Welcome, Toy Hunter!</h2>
+    <p>Find amazing pre-loved toys near you. Rent for a weekend or buy to keep — connect directly with local sellers.</p>
+    <div class="perks">
+      <div class="perk">🔍 Browse thousands of toy listings</div>
+      <div class="perk">📞 Contact sellers directly</div>
+      <div class="perk">🤝 Arrange pickup at your convenience</div>
+      <div class="perk">🌱 Eco-friendly &amp; affordable for all</div>
+    </div>
+    <div class="notice">🎫 A refundable ₹3,500 membership deposit is required to unlock seller contact details.</div>
+    <div class="sw">Seller? <a href="login-seller.html">Seller Login →</a> &nbsp;|&nbsp; <a href="login-admin.html">Admin →</a></div>
+  </div>
+
+  <!-- ══ RIGHT ══ -->
+  <div class="right">
+    <div class="logo">🧸 Toy<span>Box</span></div>
+    <div class="sub-txt">Buyer Portal — Verified access only</div>
+
+    <div class="tabs">
+      <button class="tab on" id="tL" onclick="switchTab('L')">Log In</button>
+      <button class="tab" id="tS" onclick="switchTab('S')">Sign Up</button>
+    </div>
+
+    <!-- ════ LOGIN ════ -->
+    <div class="fs on" id="fL">
+      <div class="fg">
+        <label>Email Address <span class="req">*</span></label>
+        <div class="iw">
+          <input type="email" id="lMail" placeholder="you@example.com"
+            autocomplete="email"
+            oninput="chkEmail(this,'lMailE','lMailI')"
+            onblur="chkEmail(this,'lMailE','lMailI',true)"
+            onkeydown="noSpace(event)"
+            onpaste="cleanPaste(event,'email')"/>
+          <span class="ico" id="lMailI"></span>
+        </div>
+        <div class="emsg" id="lMailE">Enter a valid email — e.g. <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="80eee1ede5c0e4efede1e9eeaee3efed">[email&#160;protected]</a></div>
+      </div>
+      <div class="fg">
+        <label>Password <span class="req">*</span></label>
+        <div class="iw">
+          <input type="password" id="lPwd" placeholder="••••••••"
+            autocomplete="current-password"
+            oninput="chkLoginPwd(this)"/>
+          <span class="ico" id="lPwdI"></span>
+        </div>
+        <div class="emsg" id="lPwdE">Password must be at least 6 characters.</div>
+      </div>
+      <div class="forgot">Forgot password?</div>
+      <button class="sbtn" onclick="doLogin()">Log In to ToyBox 🎉</button>
+      <div class="divider">or continue with</div>
+      <div class="soc">
+        <button class="soc-btn">🌐 Google</button>
+        <button class="soc-btn">📘 Facebook</button>
+      </div>
+    </div>
+
+    <!-- ════ SIGNUP ════ -->
+    <div class="fs" id="fS">
+      <!-- Step Bar -->
+      <div class="step-bar">
+        <div class="stp"><div class="stp-c active" id="sc1">1</div><div class="stp-l">Details</div></div>
+        <div class="stp-line" id="sl1"></div>
+        <div class="stp"><div class="stp-c" id="sc2">2</div><div class="stp-l">Verify</div></div>
+        <div class="stp-line" id="sl2"></div>
+        <div class="stp"><div class="stp-c" id="sc3">3</div><div class="stp-l">Done</div></div>
+      </div>
+
+      <!-- ── STEP 1: Details ── -->
+      <div id="step1">
+        <div class="row2">
+          <div class="fg">
+            <label>First Name <span class="req">*</span></label>
+            <input type="text" id="fn" placeholder="Aarav"
+              oninput="chkName(this,'fnE')"
+              onkeypress="return /[a-zA-Z ]/.test(event.key)"
+              onpaste="cleanPaste(event,'name')"/>
+            <div class="emsg" id="fnE">Only letters allowed, min 2 chars.</div>
+          </div>
+          <div class="fg">
+            <label>Last Name <span class="req">*</span></label>
+            <input type="text" id="ln" placeholder="Sharma"
+              oninput="chkName(this,'lnE')"
+              onkeypress="return /[a-zA-Z ]/.test(event.key)"
+              onpaste="cleanPaste(event,'name')"/>
+            <div class="emsg" id="lnE">Only letters allowed, min 2 chars.</div>
+          </div>
+        </div>
+        <div class="fg">
+          <label>Email Address <span class="req">*</span></label>
+          <div class="iw">
+            <input type="email" id="sMail" placeholder="you@example.com"
+              autocomplete="email"
+              oninput="chkEmail(this,'sMailE','sMailI')"
+              onblur="chkEmail(this,'sMailE','sMailI',true)"
+              onkeydown="noSpace(event)"
+              onpaste="cleanPaste(event,'email')"/>
+            <span class="ico" id="sMailI"></span>
+          </div>
+          <div class="emsg" id="sMailE">Enter a valid email — e.g. <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c4aaa5a9a184a0aba9a5adaaeaa7aba9">[email&#160;protected]</a></div>
+        </div>
+        <div class="fg">
+          <label>Mobile Number <span class="req">*</span> <span class="hint">(10 digits, numbers only)</span></label>
+          <div class="iw">
+            <span class="pfx">+91</span>
+            <input type="tel" id="sPhone" class="pfx-in" placeholder="98765 43210"
+              maxlength="10"
+              inputmode="numeric"
+              oninput="chkPhone(this)"
+              onkeypress="return /[0-9]/.test(event.key)"
+              onkeydown="preventPhoneInvalid(event)"
+              onpaste="cleanPaste(event,'phone')"/>
+            <span class="ico" id="sPhoneI"></span>
+          </div>
+          <div class="emsg" id="sPhoneE">Must be a 10-digit number starting with 6, 7, 8 or 9.</div>
+        </div>
+        <div class="fg">
+          <label>City <span class="req">*</span></label>
+          <select id="sCity">
+            <option value="">Select your city</option>
+            <option>Mumbai</option><option>Delhi</option><option>Bangalore</option>
+            <option>Hyderabad</option><option>Chennai</option><option>Pune</option>
+            <option>Ahmedabad</option><option>Kolkata</option><option>Jaipur</option>
+            <option>Surat</option><option>Vadodara</option><option>Other</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Password <span class="req">*</span> <span class="hint">(min 8 chars, letters + numbers)</span></label>
+          <div class="iw">
+            <input type="password" id="sPwd" placeholder="Min. 8 characters"
+              autocomplete="new-password"
+              oninput="chkPwd(this)"/>
+            <span class="ico" id="sPwdI"></span>
+          </div>
+          <div class="emsg" id="sPwdE">Use 8+ characters including a letter and a number.</div>
+          <div class="ps-bar"><div class="ps-seg" id="pb1"></div><div class="ps-seg" id="pb2"></div><div class="ps-seg" id="pb3"></div></div>
+        </div>
+        <div class="fg">
+          <label>Confirm Password <span class="req">*</span></label>
+          <div class="iw">
+            <input type="password" id="sPwd2" placeholder="Repeat your password"
+              autocomplete="new-password"
+              oninput="chkPwd2()"/>
+            <span class="ico" id="sPwd2I"></span>
+          </div>
+          <div class="emsg" id="sPwd2E">Passwords do not match.</div>
+        </div>
+        <div class="dep-info">🎫 After signup, pay ₹3,500 refundable deposit to unlock seller contacts.</div>
+        <div class="t-row">
+          <input type="checkbox" id="tc"/>
+          <label for="tc">I agree to the <a href="terms.html" target="_blank">Terms &amp; Conditions</a> and <a href="terms.html#privacy" target="_blank">Privacy Policy</a></label>
+        </div>
+        <button class="sbtn" onclick="goStep2()">Continue — Verify Phone →</button>
+      </div>
+
+      <!-- ── STEP 2: OTP Verification ── -->
+      <div id="step2" style="display:none">
+        <div class="otp-box">
+          <h4>📱 Verify Your Mobile Number</h4>
+          <p>We've sent a 6-digit OTP to <strong id="otpTarget"></strong>. Enter it below to verify your number.</p>
+          <div class="otp-digits">
+            <input type="tel" id="d1" maxlength="1" inputmode="numeric" onkeypress="return /[0-9]/.test(event.key)" oninput="oi(this,2)" onkeydown="ob(this,event,0)"/>
+            <input type="tel" id="d2" maxlength="1" inputmode="numeric" onkeypress="return /[0-9]/.test(event.key)" oninput="oi(this,3)" onkeydown="ob(this,event,1)"/>
+            <input type="tel" id="d3" maxlength="1" inputmode="numeric" onkeypress="return /[0-9]/.test(event.key)" oninput="oi(this,4)" onkeydown="ob(this,event,2)"/>
+            <input type="tel" id="d4" maxlength="1" inputmode="numeric" onkeypress="return /[0-9]/.test(event.key)" oninput="oi(this,5)" onkeydown="ob(this,event,3)"/>
+            <input type="tel" id="d5" maxlength="1" inputmode="numeric" onkeypress="return /[0-9]/.test(event.key)" oninput="oi(this,6)" onkeydown="ob(this,event,4)"/>
+            <input type="tel" id="d6" maxlength="1" inputmode="numeric" onkeypress="return /[0-9]/.test(event.key)" oninput="oi(this,0)" onkeydown="ob(this,event,5)"/>
+          </div>
+          <div class="resend-row">
+            <span id="timerWrap">Resend in <strong id="timerVal">30s</strong></span>
+            <a id="resendA" style="display:none" onclick="resendOTP()">Resend OTP</a>
+          </div>
+          <button class="vbtn" onclick="verifyOTP()">✅ Verify &amp; Create Account</button>
+        </div>
+        <button class="back-link" onclick="backStep1()">← Back to Details</button>
+      </div>
+
+      <!-- ── STEP 3: Success ── -->
+      <div id="step3" style="display:none">
+        <div class="success-sc">
+          <div class="big">🎉</div>
+          <h3>Account Created!</h3>
+          <p>Your mobile number is verified. Welcome to ToyBox!<br>Pay your ₹3,500 membership deposit to start browsing sellers.</p>
+          <button class="sbtn" onclick="location.href='index.html'">Go to Homepage 🏠</button>
+        </div>
+      </div>
+    </div><!-- /fS -->
+  </div><!-- /right -->
+</div><!-- /wrap -->
+
+<div class="toast" id="toast"></div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ══════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════
+function toast(msg, type='info'){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast show ${type}`;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+function setOk(el, icoId, errId){
+  el.classList.add('v-ok'); el.classList.remove('v-err');
+  if(icoId) document.getElementById(icoId).textContent = '✅';
+  if(errId) document.getElementById(errId).classList.remove('show');
+}
+function setErr(el, icoId, errId){
+  el.classList.add('v-err'); el.classList.remove('v-ok');
+  if(icoId) document.getElementById(icoId).textContent = '❌';
+  if(errId) document.getElementById(errId).classList.add('show');
+}
+function clrField(el, icoId, errId){
+  el.classList.remove('v-ok','v-err');
+  if(icoId) document.getElementById(icoId).textContent = '';
+  if(errId) document.getElementById(errId).classList.remove('show');
+}
+
+// ══════════════════════════════════════════════
+//  INPUT GUARDS  — blocks bad characters at source
+// ══════════════════════════════════════════════
+
+/* Block space key on email fields */
+function noSpace(e){ if(e.key === ' '){ e.preventDefault(); } }
+
+/* Block letters/symbols on phone fields — allow only digits */
+function preventPhoneInvalid(e){
+  const allowed = ['Backspace','Delete','Tab','ArrowLeft','ArrowRight','Home','End'];
+  if(allowed.includes(e.key)) return;
+  if(!/^[0-9]$/.test(e.key)) e.preventDefault();
+}
+
+/* Smart paste handler */
+function cleanPaste(e, type){
+  e.preventDefault();
+  let txt = (e.clipboardData || window.clipboardData).getData('text');
+  if(type === 'phone'){
+    txt = txt.replace(/\D/g, '').slice(0, 10); // digits only, max 10
+    e.target.value = txt;
+    chkPhone(e.target);
+  } else if(type === 'name'){
+    txt = txt.replace(/[^a-zA-Z ]/g, '');
+    e.target.value = txt;
+    chkName(e.target, e.target.id + 'E');
+  } else if(type === 'email'){
+    txt = txt.replace(/\s/g, ''); // strip all whitespace
+    e.target.value = txt;
+    chkEmail(e.target, e.target.id + 'E', e.target.id + 'I', true);
+  }
+}
+
+// ══════════════════════════════════════════════
+//  VALIDATORS
+// ══════════════════════════════════════════════
+
+const EMAIL_RE = /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/;
+
+function chkEmail(el, errId, icoId, blur=false){
+  const v = el.value.trim();
+  // Strip anything that looks like a space being typed
+  el.value = el.value.replace(/\s/g,'');
+  if(!v && !blur){ clrField(el,icoId,errId); return false; }
+  if(EMAIL_RE.test(v)){ setOk(el,icoId,errId); return true; }
+  else{ setErr(el,icoId,errId); return false; }
+}
+
+function chkPhone(el){
+  // Enforce digits only — strip anything non-numeric immediately
+  const cleaned = el.value.replace(/\D/g, '');
+  el.value = cleaned;
+  const v = cleaned;
+  if(v.length === 0){ clrField(el,'sPhoneI','sPhoneE'); return false; }
+  if(v.length === 10 && /^[6-9]/.test(v)){ setOk(el,'sPhoneI','sPhoneE'); return true; }
+  else{ setErr(el,'sPhoneI','sPhoneE'); return false; }
+}
+
+function chkName(el, errId){
+  const v = el.value.trim();
+  if(v.length >= 2){ el.classList.add('v-ok'); el.classList.remove('v-err'); document.getElementById(errId).classList.remove('show'); return true; }
+  if(v.length > 0){ el.classList.add('v-err'); el.classList.remove('v-ok'); document.getElementById(errId).classList.add('show'); }
+  return false;
+}
+
+function chkPwd(el){
+  const v = el.value;
+  const hasLen = v.length >= 8;
+  const hasLet = /[a-zA-Z]/.test(v);
+  const hasNum = /[0-9]/.test(v);
+  const score  = [hasLen, hasLet, hasNum].filter(Boolean).length;
+  const cols   = ['#ef4444','#f59e0b','#06D6A0'];
+  [1,2,3].forEach(i => { document.getElementById('pb'+i).style.background = i<=score ? cols[score-1] : '#e5e7eb'; });
+  if(hasLen && hasLet && hasNum){ setOk(el,'sPwdI','sPwdE'); return true; }
+  if(v.length > 0){ setErr(el,'sPwdI','sPwdE'); }
+  return false;
+}
+
+function chkPwd2(){
+  const p1 = document.getElementById('sPwd').value;
+  const el = document.getElementById('sPwd2');
+  if(!el.value){ clrField(el,'sPwd2I','sPwd2E'); return false; }
+  if(el.value === p1){ setOk(el,'sPwd2I','sPwd2E'); return true; }
+  setErr(el,'sPwd2I','sPwd2E'); return false;
+}
+
+function chkLoginPwd(el){
+  if(el.value.length >= 6){ setOk(el,'lPwdI','lPwdE'); return true; }
+  if(el.value.length > 0){ setErr(el,'lPwdI','lPwdE'); }
+  return false;
+}
+
+// ══════════════════════════════════════════════
+//  TAB SWITCH
+// ══════════════════════════════════════════════
+function switchTab(t){
+  ['L','S'].forEach(x => {
+    document.getElementById('t'+x).classList.toggle('on', x===t);
+    document.getElementById('f'+x).classList.toggle('on', x===t);
+  });
+}
+
+// ══════════════════════════════════════════════
+//  LOGIN
+// ══════════════════════════════════════════════
+async function doLogin(){
+  const eOk = chkEmail(document.getElementById('lMail'),'lMailE','lMailI',true);
+  const pOk = chkLoginPwd(document.getElementById('lPwd'));
+  if(!eOk){ toast('⚠️ Enter a valid email address','error'); return; }
+  if(!pOk){ toast('⚠️ Password must be at least 6 characters','error'); return; }
+  toast('👋 Logging you in...','info');
+  try {
+    const res = await fetch('/api/buyers/login',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        email: document.getElementById('lMail').value.trim(),
+        password: document.getElementById('lPwd').value
+      })
+    });
+    const data = await res.json();
+    if(!res.ok){ toast('❌ '+(data.error||'Login failed.'),'error'); return; }
+    localStorage.setItem('buyerToken', data.token);
+    localStorage.setItem('buyerData', JSON.stringify(data.buyer));
+    toast('✅ Welcome back, '+data.buyer.name+'!','success');
+    setTimeout(() => location.href='index.html', 1200);
+  } catch(e){ toast('❌ Cannot connect to server. Is the backend running?','error'); }
+}
+
+// ══════════════════════════════════════════════
+//  SIGNUP — STEP 1 → 2
+// ══════════════════════════════════════════════
+function goStep2(){
+  const fnOk   = chkName(document.getElementById('fn'),'fnE');
+  const lnOk   = chkName(document.getElementById('ln'),'lnE');
+  const eOk    = chkEmail(document.getElementById('sMail'),'sMailE','sMailI',true);
+  const phOk   = chkPhone(document.getElementById('sPhone'));
+  const city   = document.getElementById('sCity').value;
+  const pwOk   = chkPwd(document.getElementById('sPwd'));
+  const pw2Ok  = chkPwd2();
+  const terms  = document.getElementById('tc').checked;
+
+  if(!fnOk || !lnOk)  { toast('⚠️ Enter valid first and last name (letters only)','error'); return; }
+  if(!eOk)             { toast('⚠️ Enter a valid email address (e.g. name@domain.com)','error'); return; }
+  if(!phOk)            { toast('⚠️ Enter a valid 10-digit mobile number starting with 6-9','error'); return; }
+  if(!city)            { toast('⚠️ Please select your city','error'); return; }
+  if(!pwOk)            { toast('⚠️ Password must be 8+ chars with letters and numbers','error'); return; }
+  if(!pw2Ok)           { toast('⚠️ Passwords do not match','error'); return; }
+  if(!terms)           { toast('⚠️ Please accept the Terms & Conditions','error'); return; }
+
+  // Show OTP step
+  document.getElementById('step1').style.display = 'none';
+  document.getElementById('step2').style.display = 'block';
+  document.getElementById('sc1').className = 'stp-c done';
+  document.getElementById('sl1').className = 'stp-line done';
+  document.getElementById('sc2').className = 'stp-c active';
+
+  const ph = document.getElementById('sPhone').value;
+  document.getElementById('otpTarget').textContent = '+91 ' + ph;
+  toast('📱 OTP sent to +91 ' + ph, 'success');
+  startTimer();
+  setTimeout(() => document.getElementById('d1').focus(), 200);
+}
+
+function backStep1(){
+  document.getElementById('step2').style.display = 'none';
+  document.getElementById('step1').style.display = 'block';
+  document.getElementById('sc1').className = 'stp-c active';
+  document.getElementById('sl1').className = 'stp-line';
+  document.getElementById('sc2').className = 'stp-c';
+}
+
+// ══════════════════════════════════════════════
+//  OTP LOGIC
+// ══════════════════════════════════════════════
+let _timer;
+function startTimer(){
+  let s = 30;
+  document.getElementById('resendA').style.display = 'none';
+  document.getElementById('timerWrap').style.display = '';
+  document.getElementById('timerVal').textContent = s+'s';
+  clearInterval(_timer);
+  _timer = setInterval(() => {
+    s--;
+    document.getElementById('timerVal').textContent = s+'s';
+    if(s <= 0){
+      clearInterval(_timer);
+      document.getElementById('timerWrap').style.display = 'none';
+      document.getElementById('resendA').style.display = 'inline';
+    }
+  }, 1000);
+}
+
+function resendOTP(){
+  [1,2,3,4,5,6].forEach(i => {
+    const d = document.getElementById('d'+i);
+    d.value = ''; d.classList.remove('filled');
+  });
+  document.getElementById('d1').focus();
+  toast('📨 New OTP sent!','info');
+  startTimer();
+}
+
+function oi(el, next){
+  el.value = el.value.replace(/\D/g,''); // digits only
+  el.classList.toggle('filled', !!el.value);
+  if(el.value && next) document.getElementById('d'+next).focus();
+  // Auto-submit when all 6 filled
+  if([1,2,3,4,5,6].every(i => document.getElementById('d'+i).value)) verifyOTP();
+}
+
+function ob(el, e, prev){
+  if(e.key === 'Backspace' && !el.value && prev) document.getElementById('d'+prev).focus();
+}
+
+function verifyOTP(){
+  const code = [1,2,3,4,5,6].map(i => document.getElementById('d'+i).value).join('');
+  if(code.length < 6){ toast('⚠️ Enter all 6 OTP digits','error'); return; }
+  // Register the buyer now that OTP is "verified"
+  // (In production, send OTP to Twilio first and verify it here)
+  registerBuyer();
+}
+
+async function registerBuyer(){
+  try {
+    const res = await fetch('/api/buyers/register',{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        first_name: document.getElementById('fn').value.trim(),
+        last_name:  document.getElementById('ln').value.trim(),
+        email:      document.getElementById('sMail').value.trim(),
+        mobile:     document.getElementById('sPhone').value.trim(),
+        city:       document.getElementById('sCity').value.trim(),
+        password:   document.getElementById('sPwd').value
+      })
+    });
+    const data = await res.json();
+    if(!res.ok){ toast('❌ '+(data.error||'Registration failed.'),'error'); return; }
+    // Show success step
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('step3').style.display = 'block';
+    document.getElementById('sc2').className = 'stp-c done';
+    document.getElementById('sl2').className = 'stp-line done';
+    document.getElementById('sc3').className = 'stp-c active';
+    toast('🎉 Account created! Welcome to ToyBox!','success');
+  } catch(e){
+    toast('❌ Cannot connect to server. Is the backend running?','error');
+  }
+}
+</script>
+</body>
+</html>

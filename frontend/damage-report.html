@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ToyBox — Damage Report</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#FFF9F0;--primary:#FF6B35;--pd:#e05520;--sec:#FFD166;
+      --acc:#06D6A0;--purple:#7B5EA7;--dark:#2D2A32;--muted:#8A8490;
+      --card:#fff;--border:#EEE8E0;--err:#ef4444;--warn:#f59e0b;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--dark);min-height:100vh;}
+
+    /* NAV */
+    nav{background:rgba(255,249,240,.95);backdrop-filter:blur(12px);border-bottom:2px solid var(--border);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;}
+    .logo{font-family:'Baloo 2',cursive;font-size:1.55rem;font-weight:800;color:var(--primary);text-decoration:none;}
+    .logo span{color:var(--purple);}
+    .btn{display:inline-flex;align-items:center;gap:5px;padding:8px 18px;border-radius:50px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.84rem;cursor:pointer;border:none;transition:all .2s;text-decoration:none;}
+    .btn-out{background:transparent;color:var(--primary);border:2px solid var(--primary);}
+    .btn-out:hover{background:var(--primary);color:#fff;}
+    .btn-pri{background:var(--primary);color:#fff;box-shadow:0 4px 14px rgba(255,107,53,.3);}
+    .btn-pri:hover{background:var(--pd);transform:translateY(-2px);}
+
+    /* PAGE */
+    .wrap{max-width:840px;margin:36px auto;padding:0 22px 64px;}
+    .pg-head{margin-bottom:28px;}
+    .pg-head h1{font-family:'Baloo 2',cursive;font-size:2rem;font-weight:800;}
+    .pg-head h1 em{color:var(--primary);font-style:normal;}
+    .pg-head p{color:var(--muted);font-size:.9rem;line-height:1.6;margin-top:5px;}
+
+    /* ALERT */
+    .alert{background:#fff7ed;border:2px solid var(--warn);border-radius:16px;padding:15px 18px;margin-bottom:24px;display:flex;gap:11px;}
+    .alert .ico{font-size:1.35rem;flex-shrink:0;margin-top:2px;}
+    .alert strong{display:block;font-size:.88rem;margin-bottom:4px;}
+    .alert p{font-size:.81rem;color:#78350f;line-height:1.6;}
+
+    /* CARD */
+    .card{background:var(--card);border-radius:20px;padding:28px 30px;border:2px solid var(--border);box-shadow:0 4px 20px rgba(45,42,50,.07);margin-bottom:20px;}
+    .card h3{font-family:'Baloo 2',cursive;font-size:1.1rem;font-weight:800;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+
+    /* FIELDS */
+    .fg{margin-bottom:14px;}
+    .fg label{display:block;font-weight:700;font-size:.8rem;margin-bottom:4px;}
+    .req{color:var(--err);}
+    input[type=text],input[type=tel],select,textarea{width:100%;padding:10px 13px;border:2px solid var(--border);border-radius:12px;font-family:'Nunito',sans-serif;font-size:.9rem;outline:none;transition:border .2s;background:var(--bg);color:var(--dark);resize:vertical;}
+    input:focus,select:focus,textarea:focus{border-color:var(--primary);background:#fff;}
+    input.ok{border-color:var(--acc);}
+    input.bad{border-color:var(--err);}
+    .emsg{font-size:.7rem;color:var(--err);font-weight:700;margin-top:3px;display:none;}
+    .emsg.show{display:block;}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+    /* DAMAGE TYPE GRID */
+    .dtype-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:9px;margin-bottom:4px;}
+    .dtype-card{border:2px solid var(--border);border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg);user-select:none;}
+    .dtype-card:hover{border-color:var(--primary);}
+    .dtype-card.sel{border-color:var(--primary);background:#fff5f0;}
+    .dtype-card input[type=radio]{display:none;}
+    .dtype-card .di{font-size:2rem;margin-bottom:6px;}
+    .dtype-card .dl{font-weight:700;font-size:.8rem;}
+
+    /* SEVERITY */
+    .sev-row{display:flex;gap:9px;flex-wrap:wrap;margin-top:6px;}
+    .sev-btn{padding:9px 20px;border-radius:50px;border:2px solid var(--border);background:var(--bg);cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:.82rem;transition:all .2s;}
+    .sev-btn.minor.sel{background:#fef3c7;border-color:#f59e0b;color:#92400e;}
+    .sev-btn.mod.sel{background:#ffedd5;border-color:#ea580c;color:#9a3412;}
+    .sev-btn.major.sel{background:#fee2e2;border-color:#ef4444;color:#b91c1c;}
+
+    /* PHOTO UPLOAD */
+    .drop-zone{border:3px dashed var(--border);border-radius:18px;padding:30px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg);}
+    .drop-zone:hover,.drop-zone.drag{border-color:var(--primary);background:#fff8f5;}
+    .drop-zone .up-ico{font-size:3rem;margin-bottom:10px;}
+    .drop-zone h4{font-weight:800;font-size:.92rem;margin-bottom:4px;}
+    .drop-zone p{font-size:.78rem;color:var(--muted);}
+    #imgInput{display:none;}
+    .prev-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(105px,1fr));gap:9px;margin:12px 0 6px;}
+    .prev-item{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:1;border:2px solid var(--border);}
+    .prev-item img{width:100%;height:100%;object-fit:cover;display:block;}
+    .prev-rm{position:absolute;top:4px;right:4px;background:rgba(239,68,68,.9);color:#fff;border:none;cursor:pointer;width:22px;height:22px;border-radius:50%;font-size:.72rem;font-weight:800;display:flex;align-items:center;justify-content:center;}
+    .img-ct{font-size:.74rem;color:var(--muted);font-weight:600;}
+
+    /* DEPOSIT CALC */
+    .dep-calc{background:linear-gradient(135deg,#fff5ee,#fffdf9);border:2px solid var(--sec);border-radius:15px;padding:18px 20px;}
+    .dep-calc h4{font-family:'Baloo 2',cursive;font-size:.94rem;font-weight:800;margin-bottom:12px;}
+    .dep-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--border);font-size:.84rem;}
+    .dep-row:last-child{border:none;font-weight:800;}
+    .dep-row .lbl{color:var(--muted);}
+    .red-val{color:var(--err);font-weight:700;}
+    .grn-val{color:var(--acc);font-weight:700;}
+    .dep-note{font-size:.74rem;color:var(--muted);margin-top:9px;line-height:1.5;}
+
+    /* DECLARATION */
+    .decl-box{background:var(--bg);border-radius:13px;padding:14px;font-size:.82rem;line-height:1.7;margin-bottom:14px;}
+    .chk-row{display:flex;align-items:flex-start;gap:9px;}
+    .chk-row input[type=checkbox]{width:16px;height:16px;margin-top:3px;accent-color:var(--primary);flex-shrink:0;}
+    .chk-row label{font-weight:700;font-size:.83rem;cursor:pointer;}
+
+    /* SUBMIT */
+    .submit-wrap{text-align:center;margin-top:6px;}
+    .submit-btn{width:100%;max-width:380px;padding:14px;background:var(--primary);color:#fff;border:none;border-radius:50px;font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(255,107,53,.3);}
+    .submit-btn:hover{background:var(--pd);transform:translateY(-2px);}
+
+    /* SUCCESS MODAL */
+    .modal-bg{display:none;position:fixed;inset:0;background:rgba(45,42,50,.55);backdrop-filter:blur(4px);z-index:300;align-items:center;justify-content:center;}
+    .modal-bg.show{display:flex;}
+    .modal{background:var(--card);border-radius:26px;padding:44px 36px;text-align:center;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(45,42,50,.2);animation:pop .35s ease;}
+    @keyframes pop{from{transform:scale(.88);opacity:0;}to{transform:scale(1);opacity:1;}}
+    .modal .big{font-size:4rem;margin-bottom:12px;}
+    .modal h3{font-family:'Baloo 2',cursive;font-size:1.45rem;font-weight:800;margin-bottom:8px;}
+    .modal p{color:var(--muted);font-size:.87rem;line-height:1.6;margin-bottom:6px;}
+    .ref{display:inline-block;background:var(--bg);border:2px solid var(--border);border-radius:11px;padding:9px 18px;font-weight:800;font-size:.9rem;margin:12px 0 20px;}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(90px);padding:10px 22px;border-radius:50px;font-weight:700;font-size:.83rem;z-index:500;transition:transform .3s;white-space:nowrap;}
+    .toast.show{transform:translateX(-50%) translateY(0);}
+    .toast.success{background:var(--acc);color:#fff;}
+    .toast.error{background:var(--err);color:#fff;}
+    .toast.info{background:var(--dark);color:#fff;}
+
+    @media(max-width:620px){.row2{grid-template-columns:1fr;}.dtype-grid{grid-template-columns:repeat(3,1fr);}nav{padding:0 18px;}.wrap{padding:0 14px 40px;}}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="index.html">🧸 Toy<span>Box</span></a>
+  <a href="index.html" class="btn btn-out">← Back to Home</a>
+</nav>
+
+<div class="wrap">
+  <div class="pg-head">
+    <h1>🔴 File a <em>Damage Report</em></h1>
+    <p>Report a damaged, wrong, or missing toy. Submit with photos and we'll review within 48 hours.</p>
+  </div>
+
+  <div class="alert">
+    <span class="ico">⚠️</span>
+    <div>
+      <strong>Important — Read Before Submitting</strong>
+      <p>Filing a <strong>false</strong> report is a serious violation and may result in permanent blacklisting. Damage deductions come from the <strong>buyer's ₹3,500 deposit</strong>. Wrong product claims are deducted from the <strong>seller's account</strong>. All reports are reviewed within 48 hours.</p>
+    </div>
+  </div>
+
+  <!-- ── SECTION 1: Transaction Info ── -->
+  <div class="card">
+    <h3>📋 Rental / Transaction Details</h3>
+    <div class="row2">
+      <div class="fg">
+        <label>Your Full Name <span class="req">*</span></label>
+        <input type="text" id="rName" placeholder="Aarav Sharma"
+          onkeypress="return /[a-zA-Z ]/.test(event.key)"
+          onpaste="namePaste(event)"
+          oninput="this.classList.toggle('ok', this.value.trim().length>=2)"/>
+      </div>
+      <div class="fg">
+        <label>Your Mobile Number <span class="req">*</span></label>
+        <input type="tel" id="rPhone" placeholder="98765 43210"
+          maxlength="10" inputmode="numeric"
+          onkeypress="return /[0-9]/.test(event.key)"
+          onkeydown="preventPhoneKey(event)"
+          onpaste="phonePaste(event,'rPhone','rPhoneE')"
+          oninput="phoneOninput(this,'rPhoneE')"/>
+        <div class="emsg" id="rPhoneE">Enter a valid 10-digit number starting with 6-9.</div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="fg">
+        <label>Transaction / Rental ID <span class="req">*</span></label>
+        <input type="text" id="rTxn" placeholder="e.g. TXN-2026-00123"
+          oninput="this.classList.toggle('ok', this.value.trim().length>=4)"/>
+        <div class="emsg" id="rTxnE">Please enter the transaction ID.</div>
+      </div>
+      <div class="fg">
+        <label>Toy Name <span class="req">*</span></label>
+        <input type="text" id="rToy" placeholder="e.g. LEGO Classic Set"
+          oninput="this.classList.toggle('ok', this.value.trim().length>=2)"/>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="fg">
+        <label>Seller's Store Name <span class="req">*</span></label>
+        <input type="text" id="rSeller" placeholder="Seller name / store"
+          onkeypress="return /[a-zA-Z0-9 ]/.test(event.key)"/>
+      </div>
+      <div class="fg">
+        <label>Report Type <span class="req">*</span></label>
+        <select id="rType" onchange="updateCalc()">
+          <option value="">Select report type</option>
+          <option value="dmg_buyer">🛑 Damage caused by me (buyer)</option>
+          <option value="dmg_recv">📦 Toy arrived already damaged</option>
+          <option value="wrong">🔄 Wrong product received</option>
+          <option value="missing">🧩 Missing parts / accessories</option>
+          <option value="overdue">⏰ Overdue rental (non-return)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION 2: Damage Type ── -->
+  <div class="card">
+    <h3>🔍 Nature of Damage</h3>
+    <div class="dtype-grid" id="dtypeGrid">
+      <label class="dtype-card"><input type="radio" name="dtype" value="broken"/><div class="di">💔</div><div class="dl">Broken / Cracked</div></label>
+      <label class="dtype-card"><input type="radio" name="dtype" value="scratch"/><div class="di">🔧</div><div class="dl">Scratch / Dent</div></label>
+      <label class="dtype-card"><input type="radio" name="dtype" value="missing"/><div class="di">🧩</div><div class="dl">Missing Parts</div></label>
+      <label class="dtype-card"><input type="radio" name="dtype" value="stain"/><div class="di">💧</div><div class="dl">Stain / Dirt</div></label>
+      <label class="dtype-card"><input type="radio" name="dtype" value="wrong"/><div class="di">🔄</div><div class="dl">Wrong Item</div></label>
+      <label class="dtype-card"><input type="radio" name="dtype" value="other"/><div class="di">📝</div><div class="dl">Other</div></label>
+    </div>
+
+    <div class="fg" style="margin-top:16px;">
+      <label>Damage Severity <span class="req">*</span></label>
+      <div class="sev-row">
+        <button type="button" class="sev-btn minor" onclick="selSev(this,'minor')">🟡 Minor</button>
+        <button type="button" class="sev-btn mod"   onclick="selSev(this,'mod')">🟠 Moderate</button>
+        <button type="button" class="sev-btn major" onclick="selSev(this,'major')">🔴 Major</button>
+      </div>
+    </div>
+
+    <div class="fg" style="margin-top:12px;">
+      <label>Describe the Damage in Detail <span class="req">*</span></label>
+      <textarea id="rDesc" rows="4" placeholder="Describe exactly what happened, what part is damaged, and how it occurred. Be as specific as possible…"></textarea>
+    </div>
+  </div>
+
+  <!-- ── SECTION 3: Photos ── -->
+  <div class="card">
+    <h3>📸 Upload Damage Photos <span style="font-size:.78rem;font-weight:600;color:var(--muted)">(required · min 1 · max 6)</span></h3>
+    <div class="drop-zone" id="dropZone"
+      onclick="document.getElementById('imgInput').click()"
+      ondragover="dragOver(event)"
+      ondragleave="dragLeave(event)"
+      ondrop="onDrop(event)">
+      <div class="up-ico">📷</div>
+      <h4>Click to browse or drag &amp; drop photos</h4>
+      <p>JPG · PNG · WEBP &nbsp;·&nbsp; Max 5 MB per photo &nbsp;·&nbsp; Up to 6 photos</p>
+    </div>
+    <input type="file" id="imgInput" accept="image/jpeg,image/png,image/webp" multiple onchange="handleFiles(event.target.files)"/>
+    <div class="prev-grid" id="prevGrid"></div>
+    <div class="img-ct" id="imgCount"></div>
+  </div>
+
+  <!-- ── SECTION 4: Deposit Estimate ── -->
+  <div class="card">
+    <h3>💰 Estimated Deposit Impact</h3>
+    <div class="dep-calc">
+      <h4>Deposit Breakdown Preview</h4>
+      <div class="dep-row"><span class="lbl">Original Deposit</span><span>₹3,500</span></div>
+      <div class="dep-row"><span class="lbl">Estimated Deduction</span><span class="red-val" id="dedAmt">₹0</span></div>
+      <div class="dep-row"><span class="lbl">Estimated Remaining</span><span class="grn-val" id="remAmt">₹3,500</span></div>
+    </div>
+    <p class="dep-note">⚠️ Final deduction is decided by the ToyBox admin team after reviewing your report and photos. This is only an estimate.</p>
+  </div>
+
+  <!-- ── SECTION 5: Declaration ── -->
+  <div class="card">
+    <h3>✍️ Declaration</h3>
+    <div class="decl-box">
+      I hereby declare that all information provided in this damage report is accurate and truthful to the best of my knowledge. I understand that submitting a false report may result in <strong>permanent blacklisting</strong> of my account and <strong>full forfeiture</strong> of my ₹3,500 membership deposit.
+    </div>
+    <div class="chk-row">
+      <input type="checkbox" id="declChk"/>
+      <label for="declChk">I confirm that this report is truthful and accept responsibility for any false claims.</label>
+    </div>
+  </div>
+
+  <div class="submit-wrap">
+    <button class="submit-btn" onclick="submitReport()">📤 Submit Damage Report</button>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-bg" id="successModal">
+  <div class="modal">
+    <div class="big">✅</div>
+    <h3>Report Submitted!</h3>
+    <p>Your damage report has been received. Our admin team will review it within <strong>48 hours</strong>.</p>
+    <p>You'll be notified via SMS and email about the outcome and any deposit changes.</p>
+    <div class="ref" id="refCode"></div>
+    <a href="index.html" class="btn btn-pri" style="display:block;justify-content:center;width:100%;text-align:center;padding:12px;">Back to Homepage 🏠</a>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let photos = [];
+let severity = '';
+
+// ── TOAST ──
+function toast(m, t='info'){
+  const el=document.getElementById('toast');
+  el.textContent=m; el.className=`toast show ${t}`;
+  clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('show'),3200);
+}
+
+// ── PHONE INPUT GUARD ──
+function preventPhoneKey(e){
+  const ok=['Backspace','Delete','Tab','ArrowLeft','ArrowRight','Home','End'];
+  if(ok.includes(e.key)) return;
+  if(!/^[0-9]$/.test(e.key)) e.preventDefault();
+}
+function phoneOninput(el, errId){
+  el.value = el.value.replace(/\D/g,''); // strip non-digits immediately
+  const v = el.value;
+  if(v.length===10 && /^[6-9]/.test(v)){
+    el.classList.add('ok'); el.classList.remove('bad');
+    document.getElementById(errId).classList.remove('show');
+  } else if(v.length>0){
+    el.classList.add('bad'); el.classList.remove('ok');
+    document.getElementById(errId).classList.add('show');
+  } else {
+    el.classList.remove('ok','bad');
+    document.getElementById(errId).classList.remove('show');
+  }
+}
+function phonePaste(e, elId, errId){
+  e.preventDefault();
+  const txt=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,10);
+  document.getElementById(elId).value=txt;
+  phoneOninput(document.getElementById(elId), errId);
+}
+function namePaste(e){
+  e.preventDefault();
+  const txt=(e.clipboardData||window.clipboardData).getData('text').replace(/[^a-zA-Z ]/g,'');
+  e.target.value=txt;
+}
+
+// ── DAMAGE TYPE SELECT ──
+document.querySelectorAll('.dtype-card').forEach(c=>{
+  c.addEventListener('click',()=>{
+    document.querySelectorAll('.dtype-card').forEach(x=>x.classList.remove('sel'));
+    c.classList.add('sel');
+    c.querySelector('input').checked=true;
+  });
+});
+
+// ── SEVERITY ──
+function selSev(btn, v){
+  document.querySelectorAll('.sev-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  severity=v;
+  updateCalc();
+}
+
+// ── DEPOSIT ESTIMATE ──
+const DED_MAP={
+  dmg_buyer:  {minor:300,  mod:700,  major:1500},
+  dmg_recv:   {minor:0,    mod:0,    major:0},
+  wrong:      {minor:500,  mod:800,  major:1200},
+  missing:    {minor:200,  mod:500,  major:900},
+  overdue:    {minor:3500, mod:3500, major:3500}
+};
+function updateCalc(){
+  const type=document.getElementById('rType').value;
+  const ded=(DED_MAP[type]&&severity)? DED_MAP[type][severity] : 0;
+  document.getElementById('dedAmt').textContent = ded>0 ? `-₹${ded}` : '₹0';
+  document.getElementById('remAmt').textContent = `₹${Math.max(0,3500-ded)}`;
+}
+
+// ── PHOTO UPLOAD ──
+function handleFiles(files){
+  const arr=Array.from(files);
+  if(photos.length+arr.length>6){ toast('⚠️ Maximum 6 photos allowed','error'); return; }
+  arr.forEach(f=>{
+    if(f.size>5*1024*1024){ toast(`⚠️ ${f.name} exceeds 5 MB limit`,'error'); return; }
+    const r=new FileReader();
+    r.onload=e=>{photos.push({src:e.target.result,name:f.name}); renderPrev();};
+    r.readAsDataURL(f);
+  });
+}
+function removePhoto(i){ photos.splice(i,1); renderPrev(); }
+function renderPrev(){
+  document.getElementById('prevGrid').innerHTML=
+    photos.map((p,i)=>`
+      <div class="prev-item">
+        <img src="${p.src}" alt="damage"/>
+        <button class="prev-rm" onclick="removePhoto(${i})" title="Remove">✕</button>
+      </div>`).join('');
+  const ct=photos.length;
+  document.getElementById('imgCount').textContent = ct ? `${ct} photo${ct>1?'s':''} selected` : '';
+}
+function dragOver(e){ e.preventDefault(); document.getElementById('dropZone').classList.add('drag'); }
+function dragLeave(){ document.getElementById('dropZone').classList.remove('drag'); }
+function onDrop(e){ e.preventDefault(); dragLeave(); handleFiles(e.dataTransfer.files); }
+
+// ── SUBMIT ──
+function submitReport(){
+  const name   = document.getElementById('rName').value.trim();
+  const phone  = document.getElementById('rPhone').value;
+  const txn    = document.getElementById('rTxn').value.trim();
+  const toy    = document.getElementById('rToy').value.trim();
+  const type   = document.getElementById('rType').value;
+  const desc   = document.getElementById('rDesc').value.trim();
+  const dtype  = document.querySelector('.dtype-card.sel');
+  const decl   = document.getElementById('declChk').checked;
+
+  if(!name)               { toast('⚠️ Enter your full name','error'); return; }
+  if(!phone||phone.length!==10||!/^[6-9]/.test(phone)) { toast('⚠️ Enter a valid 10-digit mobile number','error'); return; }
+  if(!txn)                { toast('⚠️ Enter the transaction ID','error'); return; }
+  if(!toy)                { toast('⚠️ Enter the toy name','error'); return; }
+  if(!type)               { toast('⚠️ Select a report type','error'); return; }
+  if(!dtype)              { toast('⚠️ Select the type of damage','error'); return; }
+  if(!severity)           { toast('⚠️ Select damage severity','error'); return; }
+  if(desc.length<15)      { toast('⚠️ Describe the damage in more detail (min 15 chars)','error'); return; }
+  if(photos.length===0)   { toast('⚠️ Upload at least 1 damage photo','error'); return; }
+  if(!decl)               { toast('⚠️ Please accept the declaration to proceed','error'); return; }
+
+  const ref = 'DMG-' + Date.now().toString().slice(-8);
+  document.getElementById('refCode').textContent = ref;
+  document.getElementById('successModal').classList.add('show');
+}
+</script>
+</body>
+</html>

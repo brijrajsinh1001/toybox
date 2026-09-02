@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ToyBox — Admin Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#0F0D1A;--surface:#1A1726;--card:#221E30;--primary:#7B5EA7;--pl:#9B7EC8;--sec:#FFD166;--acc:#06D6A0;--danger:#FF6B6B;--orange:#FF6B35;--text:#F0EDF8;--muted:#8A8490;--border:#2E2A3D;}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+    /* NAV */
+    nav{background:rgba(26,23,38,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:66px;position:sticky;top:0;z-index:100;}
+    .logo{font-family:'Baloo 2',cursive;font-size:1.6rem;font-weight:800;color:var(--pl);display:flex;align-items:center;gap:6px;}
+    .logo span{color:var(--sec);}
+    .admin-tag{background:var(--primary);color:#fff;font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;letter-spacing:.5px;}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:50px;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.86rem;cursor:pointer;border:none;transition:all .2s;text-decoration:none;}
+    .btn-purple{background:var(--primary);color:#fff;}
+    .btn-purple:hover{background:#6a4f92;transform:translateY(-2px);}
+    .btn-outline{background:transparent;color:var(--pl);border:2px solid var(--primary);}
+    .btn-outline:hover{background:var(--primary);color:#fff;}
+    .btn-green{background:var(--acc);color:#fff;}
+    .btn-green:hover{background:#05bc8d;}
+    .btn-red{background:var(--danger);color:#fff;}
+    .btn-red:hover{background:#e55;}
+    .btn-orange{background:var(--orange);color:#fff;}
+
+    /* PAGES */
+    .page{display:none;}.page.active{display:block;}
+
+    /* LOGIN */
+    .login-center{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 66px);padding:24px;}
+    .login-wrap{display:flex;width:100%;max-width:900px;min-height:560px;border-radius:28px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.5);border:1px solid var(--border);}
+    .ll{flex:1;background:linear-gradient(160deg,#3b2f6e,#7B5EA7);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 36px;text-align:center;color:#fff;position:relative;overflow:hidden;}
+    .ll::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='3' fill='%23ffffff' fill-opacity='0.05'/%3E%3C/svg%3E");}
+    .shield{font-size:5rem;margin-bottom:18px;position:relative;z-index:1;}
+    .ll h2{font-family:'Baloo 2',cursive;font-size:1.8rem;font-weight:800;margin-bottom:10px;position:relative;z-index:1;}
+    .ll p{font-size:0.88rem;opacity:.8;line-height:1.7;margin-bottom:24px;position:relative;z-index:1;}
+    .access-list{display:flex;flex-direction:column;gap:10px;width:100%;position:relative;z-index:1;}
+    .al{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:10px 14px;font-size:0.83rem;font-weight:700;display:flex;align-items:center;gap:10px;text-align:left;}
+    .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+    .dg{background:#06D6A0;box-shadow:0 0 6px #06D6A0;}
+    .dy{background:#FFD166;box-shadow:0 0 6px #FFD166;}
+    .dr{background:#FF6B6B;box-shadow:0 0 6px #FF6B6B;}
+    .lr{flex:1.1;background:var(--card);padding:52px 44px;display:flex;flex-direction:column;justify-content:center;}
+    .atag{display:inline-flex;align-items:center;gap:6px;background:rgba(123,94,167,.15);border:1px solid rgba(123,94,167,.3);color:var(--pl);font-size:0.72rem;font-weight:800;padding:4px 12px;border-radius:50px;margin-bottom:14px;letter-spacing:1px;text-transform:uppercase;}
+    .form-logo{font-family:'Baloo 2',cursive;font-size:1.5rem;font-weight:800;color:var(--pl);margin-bottom:4px;}
+    .form-logo span{color:var(--sec);}
+    .form-sub{font-size:0.83rem;color:var(--muted);margin-bottom:28px;}
+    .fg{margin-bottom:16px;}
+    .fg label{display:block;font-weight:700;font-size:0.81rem;margin-bottom:6px;color:var(--text);}
+    .iw{position:relative;}
+    .iw .icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:.95rem;pointer-events:none;}
+    .fg input{width:100%;padding:12px 15px 12px 38px;border:2px solid var(--border);border-radius:13px;font-family:'Nunito',sans-serif;font-size:0.9rem;outline:none;transition:border-color .2s;background:var(--surface);color:var(--text);}
+    .fg input:focus{border-color:var(--primary);}
+    .fg input::placeholder{color:#5a5470;}
+    .row-between{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+    .remember{display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--muted);cursor:pointer;}
+    .forgot{font-size:0.78rem;color:var(--pl);font-weight:700;cursor:pointer;}
+    .sbtn{width:100%;padding:13px;background:linear-gradient(135deg,#7B5EA7,#9B7EC8);color:#fff;border:none;border-radius:50px;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.98rem;cursor:pointer;transition:all .2s;margin-bottom:14px;box-shadow:0 4px 18px rgba(123,94,167,.4);}
+    .sbtn:hover{background:linear-gradient(135deg,#9B7EC8,#7B5EA7);transform:translateY(-2px);}
+    .sec-note{display:flex;align-items:center;gap:8px;background:rgba(6,214,160,.08);border:1px solid rgba(6,214,160,.2);border-radius:12px;padding:10px 14px;font-size:0.76rem;color:var(--acc);font-weight:600;}
+    .otp-wrap{display:none;}
+    .otp-wrap.active{display:block;}
+    .cred-wrap{}
+    .otp-title{font-family:'Baloo 2',cursive;font-size:1.1rem;color:var(--text);margin-bottom:6px;}
+    .otp-desc{font-size:0.82rem;color:var(--muted);margin-bottom:22px;line-height:1.6;}
+    .otp-row{display:flex;gap:10px;margin-bottom:22px;}
+    .otp-row input{flex:1;padding:14px 0;text-align:center;border:2px solid var(--border);border-radius:13px;background:var(--surface);color:var(--text);font-family:'Baloo 2',cursive;font-size:1.4rem;font-weight:800;outline:none;transition:border-color .2s;}
+    .otp-row input:focus{border-color:var(--primary);}
+    .resend{font-size:0.78rem;color:var(--muted);margin-bottom:18px;}
+    .resend a{color:var(--pl);font-weight:700;cursor:pointer;}
+
+    /* DASHBOARD */
+    .dash-header{background:linear-gradient(135deg,#3b2f6e,#7B5EA7);padding:36px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+    .dash-title{font-family:'Baloo 2',cursive;font-size:1.6rem;font-weight:800;}
+    .dash-title small{display:block;font-size:0.82rem;opacity:.75;font-family:'Nunito',sans-serif;font-weight:600;margin-top:2px;}
+    .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;padding:28px 40px;max-width:1200px;margin:0 auto;}
+    .kpi{background:var(--card);border-radius:18px;padding:20px;border:1px solid var(--border);text-align:center;}
+    .kpi-num{font-family:'Baloo 2',cursive;font-size:2rem;font-weight:800;margin-bottom:4px;}
+    .kpi-lbl{font-size:0.78rem;color:var(--muted);font-weight:600;}
+    .kpi.green .kpi-num{color:var(--acc);}
+    .kpi.yellow .kpi-num{color:var(--sec);}
+    .kpi.red .kpi-num{color:var(--danger);}
+    .kpi.purple .kpi-num{color:var(--pl);}
+    .kpi.orange .kpi-num{color:var(--orange);}
+    .dash-body{max-width:1200px;margin:0 auto;padding:0 40px 40px;}
+    .dash-tabs{display:flex;gap:6px;margin-bottom:24px;flex-wrap:wrap;}
+    .dtab{padding:9px 20px;border-radius:50px;border:1px solid var(--border);background:var(--card);cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.85rem;transition:all .2s;color:var(--text);}
+    .dtab.active,.dtab:hover{background:var(--primary);color:#fff;border-color:var(--primary);}
+    .dsec{display:none;}.dsec.active{display:block;}
+    table{width:100%;border-collapse:collapse;}
+    thead tr{background:var(--surface);}
+    th{padding:12px 14px;text-align:left;font-size:0.78rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+    td{padding:12px 14px;font-size:0.85rem;border-bottom:1px solid var(--border);}
+    tr:hover td{background:rgba(255,255,255,.03);}
+    .tbl-wrap{background:var(--card);border-radius:18px;overflow:hidden;border:1px solid var(--border);}
+    .tbl-head{padding:18px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;}
+    .tbl-head h3{font-family:'Baloo 2',cursive;font-size:1.05rem;font-weight:800;}
+    .badge{font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:50px;}
+    .b-active{background:rgba(6,214,160,.15);color:var(--acc);}
+    .b-black{background:rgba(255,107,107,.15);color:var(--danger);}
+    .b-pending{background:rgba(255,209,102,.15);color:var(--sec);}
+    .b-approved{background:rgba(6,214,160,.15);color:var(--acc);}
+    .search-inp{padding:8px 14px;border:1px solid var(--border);border-radius:50px;background:var(--surface);color:var(--text);font-family:'Nunito',sans-serif;font-size:0.83rem;outline:none;width:200px;}
+    .search-inp:focus{border-color:var(--primary);}
+    .action-btns{display:flex;gap:6px;flex-wrap:wrap;}
+    .action-btns .btn{padding:6px 12px;font-size:0.76rem;}
+
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--primary);color:#fff;padding:11px 22px;border-radius:50px;font-weight:700;font-size:0.86rem;z-index:400;transition:transform .3s;}
+    .toast.show{transform:translateX(-50%) translateY(0);}
+    @media(max-width:680px){.ll{display:none;}.lr{padding:36px 24px;}.dash-body,.kpi-grid{padding-left:20px;padding-right:20px;}.dash-header{padding:28px 20px;}}
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">🧸 Toy<span>Box</span> <span class="admin-tag">ADMIN</span></div>
+  <div id="navR">
+    <a href="index.html" class="btn btn-outline">🏠 Browse Site</a>
+  </div>
+</nav>
+
+<!-- LOGIN -->
+<div class="page active" id="page-login">
+  <div class="login-center">
+    <div class="login-wrap">
+      <div class="ll">
+        <div class="shield">🛡️</div>
+        <h2>Admin Control Center</h2>
+        <p>Restricted access. Authorized personnel only. All activity is logged.</p>
+        <div class="access-list">
+          <div class="al"><span class="dot dg"></span> Manage users & blacklists</div>
+          <div class="al"><span class="dot dy"></span> Review & approve toy listings</div>
+          <div class="al"><span class="dot dr"></span> Handle disputes & deposits</div>
+          <div class="al"><span class="dot dg"></span> Platform analytics & KPIs</div>
+          <div class="al"><span class="dot dy"></span> Membership & payments</div>
+        </div>
+      </div>
+      <div class="lr">
+        <div class="atag">🔐 Admin Access</div>
+        <div class="form-logo">🧸 Toy<span>Box</span></div>
+        <div class="form-sub">Super Admin Portal — Secure 2-step login</div>
+        <div class="cred-wrap" id="credWrap">
+          <div class="fg"><label>Admin Email</label><div class="iw"><span class="icon">📧</span><input type="email" id="ae" placeholder="admin@toybox.com"/></div></div>
+          <div class="fg"><label>Password</label><div class="iw"><span class="icon">🔑</span><input type="password" id="ap" placeholder="••••••••••••"/></div></div>
+          <div class="row-between">
+            <label class="remember"><input type="checkbox" style="width:auto;padding:0"/> Remember device</label>
+            <span class="forgot">Forgot password?</span>
+          </div>
+          <button type="button" class="sbtn" id="loginBtn" onclick="doLogin()">Access Admin Panel →</button>
+          <div class="sec-note">🔒 This session is encrypted. All actions are logged and monitored.</div>
+        </div>
+        <div class="otp-wrap" id="otpWrap">
+          <div class="otp-title">🔐 Two-Factor Verification</div>
+          <div class="otp-desc">A 6-digit OTP has been sent to your registered email and mobile. Enter it to continue.</div>
+          <div class="otp-row">
+            <input type="text" maxlength="1" oninput="focusNext(this,2)" id="o1"/>
+            <input type="text" maxlength="1" oninput="focusNext(this,3)" id="o2"/>
+            <input type="text" maxlength="1" oninput="focusNext(this,4)" id="o3"/>
+            <input type="text" maxlength="1" oninput="focusNext(this,5)" id="o4"/>
+            <input type="text" maxlength="1" oninput="focusNext(this,6)" id="o5"/>
+            <input type="text" maxlength="1" id="o6"/>
+          </div>
+          <div class="resend">Didn't receive? <a onclick="toast('📨 OTP resent!')">Resend OTP</a></div>
+          <button class="sbtn" onclick="verifyOTP()">Verify & Enter Dashboard ✅</button>
+          <div class="sec-note">🔒 OTP expires in 5 minutes. Never share it.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="page" id="page-dash">
+  <div class="dash-header">
+    <div>
+      <div class="dash-title">🛡️ Admin Dashboard <small>Logged in as: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2746434a4e496753485e45485f0944484a">[email&#160;protected]</a></small></div>
+    </div>
+    <button class="btn btn-outline" onclick="doLogout()">Logout</button>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi green"><div class="kpi-num">4,218</div><div class="kpi-lbl">Total Listings</div></div>
+    <div class="kpi purple"><div class="kpi-num">12,540</div><div class="kpi-lbl">Registered Buyers</div></div>
+    <div class="kpi yellow"><div class="kpi-num">₹4.4Cr</div><div class="kpi-lbl">Deposits Held</div></div>
+    <div class="kpi orange"><div class="kpi-num">38</div><div class="kpi-lbl">Pending Approvals</div></div>
+    <div class="kpi red"><div class="kpi-num">12</div><div class="kpi-lbl">Blacklisted Users</div></div>
+    <div class="kpi green"><div class="kpi-num">97.2%</div><div class="kpi-lbl">Return Rate</div></div>
+  </div>
+  <div class="dash-body">
+    <div class="dash-tabs">
+      <button class="dtab active" onclick="swDash('users',this);loadBuyers()">👥 Buyers</button>
+      <button class="dtab" onclick="swDash('sellers',this);loadSellers()">🏪 Sellers</button>
+      <button class="dtab" onclick="swDash('listings',this);loadListings()">📦 Listings</button>
+      <button class="dtab" onclick="swDash('deposits',this);loadDeposits()">💰 Deposits</button>
+      <button class="dtab" onclick="swDash('blacklist',this);loadBlacklist()">🚫 Blacklist</button>
+    </div>
+
+    <!-- BUYERS -->
+    <div class="dsec active" id="ds-users">
+      <div class="tbl-wrap">
+        <div class="tbl-head"><h3>👥 All Buyers</h3><button class="btn btn-outline" onclick="loadBuyers()" style="font-size:.8rem;padding:5px 14px">↻ Refresh</button></div>
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>City</th><th>Deposit</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="buyersTbody">
+            <tr><td colspan="6" style="text-align:center;padding:24px;color:#888">Loading buyers...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SELLERS -->
+    <div class="dsec" id="ds-sellers">
+      <div class="tbl-wrap">
+        <div class="tbl-head"><h3>🏪 All Sellers</h3><button class="btn btn-outline" onclick="loadSellers()" style="font-size:.8rem;padding:5px 14px">↻ Refresh</button></div>
+        <table>
+          <thead><tr><th>Store Name</th><th>Email</th><th>City</th><th>Rating</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="sellersTbody">
+            <tr><td colspan="6" style="text-align:center;padding:24px;color:#888">Loading sellers...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <div class="dsec" id="ds-sellers">
+      <div class="tbl-wrap">
+        <div class="tbl-head"><h3>🏪 All Sellers</h3><input class="search-inp" placeholder="🔍 Search seller..."/></div>
+        <table>
+          <thead><tr><th>Store Name</th><th>Email</th><th>City</th><th>Listings</th><th>Rating</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td>Priya's Toy Corner</td><td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f383819a8a92b3968b929e839f96dd909c9e">[email&#160;protected]</a></td><td>Mumbai</td><td>8</td><td>⭐ 4.8</td><td><span class="badge b-active">Active</span></td><td><div class="action-btns"><button class="btn btn-red" onclick="toast('🚫 Seller suspended')">Suspend</button><button class="btn btn-outline" onclick="toast('📋 Profile opened')">View</button></div></td></tr>
+            <tr><td>Rahul's Toy Hub</td><td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="8af8e2ffe8caeff2ebe7fae6efa4e9e5e7">[email&#160;protected]</a></td><td>Pune</td><td>3</td><td>⭐ 4.2</td><td><span class="badge b-active">Active</span></td><td><div class="action-btns"><button class="btn btn-red" onclick="toast('🚫 Seller suspended')">Suspend</button><button class="btn btn-outline" onclick="toast('📋 Profile opened')">View</button></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <div class="dsec" id="ds-listings">
+      <div class="tbl-wrap">
+        <div class="tbl-head"><h3>📦 Toy Listings (Pending Approval)</h3><button class="btn btn-outline" onclick="loadListings()" style="font-size:.8rem;padding:5px 14px">↻ Refresh</button></div>
+        <table>
+          <thead><tr><th>Toy Name</th><th>Seller</th><th>Category</th><th>Type</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="listingsTbody">
+            <tr><td colspan="7" style="text-align:center;padding:24px;color:#888">Loading listings...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DEPOSITS -->
+    <div class="dsec" id="ds-deposits">
+      <div class="tbl-wrap">
+        <div class="tbl-head"><h3>💰 Membership Deposits</h3><button class="btn btn-outline" onclick="loadDeposits()" style="font-size:.8rem;padding:5px 14px">↻ Refresh</button></div>
+        <table>
+          <thead><tr><th>Buyer</th><th>Email</th><th>Balance</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="depositsTbody">
+            <tr><td colspan="5" style="text-align:center;padding:24px;color:#888">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- DEDUCT MODAL -->
+      <div id="deductModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:999;align-items:center;justify-content:center;">
+        <div style="background:#1e1b2e;border-radius:16px;padding:28px;width:380px;max-width:90%;">
+          <h3 style="margin-bottom:16px;">💰 Deduct from Deposit</h3>
+          <div style="margin-bottom:12px;color:#aaa;font-size:.9rem;" id="deductBuyerName"></div>
+          <input id="deductAmount" type="number" placeholder="Amount to deduct (₹)" style="width:100%;padding:10px;border-radius:8px;border:1px solid #444;background:#2a2740;color:#fff;margin-bottom:10px;"/>
+          <input id="deductReason" type="text" placeholder="Reason (e.g. toy damage)" style="width:100%;padding:10px;border-radius:8px;border:1px solid #444;background:#2a2740;color:#fff;margin-bottom:16px;"/>
+          <div style="display:flex;gap:10px;">
+            <button class="btn btn-red" onclick="confirmDeduct()" style="flex:1;">Deduct</button>
+            <button class="btn btn-outline" onclick="document.getElementById('deductModal').style.display='none'" style="flex:1;">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLACKLIST -->
+    <div class="dsec" id="ds-blacklist">
+      <div class="tbl-wrap">
+        <div class="tbl-head"><h3>🚫 Blacklisted Buyers</h3><button class="btn btn-outline" onclick="loadBlacklist()" style="font-size:.8rem;padding:5px 14px">↻ Refresh</button></div>
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Reason</th><th>Balance</th><th>Actions</th></tr></thead>
+          <tbody id="blacklistTbody">
+            <tr><td colspan="5" style="text-align:center;padding:24px;color:#888">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+  </div><!-- BLACKLIST -->
+    <div class="dsec" id="ds-blacklist">
+      <div class="tbl-wrap">
+        <div class="tbl-head"><h3>🚫 Blacklisted Users</h3></div>
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Reason</th><th>Date</th><th>Deposit</th><th>Actions</th></tr></thead>
+          <tbody>
+            <tr><td>Rahul Joshi</td><td><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1466757c617854716c75796478713a777b79">[email&#160;protected]</a></td><td>Did not return toy after 14 days</td><td>Feb 28, 2026</td><td style="color:var(--danger)">Forfeited (₹3,500)</td><td><button class="btn btn-green" onclick="toast('✅ User unbanned after review')">Unban</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2700);}
+  let _adminId = null;
+
+  async function doLogin(){
+    const e=document.getElementById('ae').value.trim();
+    const p=document.getElementById('ap').value;
+    if(!e||!p){toast('⚠️ Please fill in all fields');return;}
+    toast('📨 Checking credentials...');
+    try {
+      const res = await fetch('/api/admin/login',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({email:e, password:p})
+      });
+      const data = await res.json();
+      if(!res.ok){toast('❌ '+(data.error||'Login failed.'));return;}
+      _adminId = data.admin_id;
+      toast('📨 OTP sent to your email!');
+      setTimeout(()=>{
+        document.getElementById('credWrap').style.display='none';
+        document.getElementById('otpWrap').classList.add('active');
+        document.getElementById('o1').focus();
+      },1100);
+    } catch(err){toast('❌ Cannot connect to server. Is backend running?');}
+  }
+
+  function focusNext(el,n){
+    if(el.value.length===1 && n<=6) document.getElementById('o'+n).focus();
+  }
+
+  async function verifyOTP(){
+    const otp=[1,2,3,4,5,6].map(i=>document.getElementById('o'+i).value).join('');
+    if(otp.length<6){toast('⚠️ Enter all 6 digits');return;}
+    if(!_adminId){toast('⚠️ Please login again');return;}
+    try {
+      const res = await fetch('/api/admin/verify-otp',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({admin_id:_adminId, otp})
+      });
+      const data = await res.json();
+      if(!res.ok){toast('❌ '+(data.error||'OTP invalid.'));return;}
+      localStorage.setItem('adminToken', data.token);
+      toast('✅ Verified! Loading dashboard...');
+      setTimeout(()=>{
+        document.getElementById('page-login').classList.remove('active');
+        document.getElementById('page-dash').classList.add('active');
+        loadBuyers(); loadDeposits();
+      },1000);
+    } catch(err){toast('❌ Cannot connect to server.');}
+  }
+
+
+  // ── LOAD DEPOSITS ─────────────────────────────────────
+  let _deductBuyerId = null;
+
+  async function loadDeposits() {
+    const token = localStorage.getItem('adminToken');
+    const tbody = document.getElementById('depositsTbody');
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:#888">Loading...</td></tr>';
+    try {
+      const res  = await fetch('/api/admin/buyers', { headers: { 'Authorization': 'Bearer ' + token } });
+      const data = await res.json();
+      const paid = data.filter(b => b.membership_paid);
+      if (!paid.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:#888">No buyers have paid membership yet</td></tr>';
+        return;
+      }
+      tbody.innerHTML = paid.map(b => `
+        <tr>
+          <td><strong>${b.first_name} ${b.last_name}</strong></td>
+          <td style="font-size:.85rem;color:#aaa">${b.email}</td>
+          <td style="font-weight:800;color:${b.deposit_balance>0?'#06D6A0':'#f66'}">₹${Number(b.deposit_balance).toLocaleString()}</td>
+          <td>${b.is_blacklisted
+            ? '<span class="badge b-black">Blacklisted</span>'
+            : '<span class="badge b-active">Active</span>'}</td>
+          <td><button class="btn btn-outline" onclick="openDeductModal(${b.id},'${b.first_name} ${b.last_name}')">💰 Deduct</button></td>
+        </tr>`).join('');
+    } catch(e) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:#f66">Error loading deposits</td></tr>';
+    }
+  }
+
+  function openDeductModal(buyerId, buyerName) {
+    _deductBuyerId = buyerId;
+    document.getElementById('deductBuyerName').textContent = 'Buyer: ' + buyerName;
+    document.getElementById('deductAmount').value = '';
+    document.getElementById('deductReason').value = '';
+    document.getElementById('deductModal').style.display = 'flex';
+  }
+
+  async function confirmDeduct() {
+    const token  = localStorage.getItem('adminToken');
+    const amount = document.getElementById('deductAmount').value;
+    const reason = document.getElementById('deductReason').value;
+    if (!amount || !reason) { toast('⚠️ Enter amount and reason'); return; }
+    try {
+      const res = await fetch('/api/admin/deposits/deduct', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer '+token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ buyer_id: _deductBuyerId, amount, reason })
+      });
+      const data = await res.json();
+      if (!res.ok) { toast('❌ '+(data.error||'Failed')); return; }
+      document.getElementById('deductModal').style.display = 'none';
+      toast('✅ ₹'+amount+' deducted. New balance: ₹'+data.new_balance);
+      loadDeposits();
+    } catch(e) { toast('❌ Cannot connect to server'); }
+  }
+
+  // ── LOAD BLACKLIST ─────────────────────────────────────
+  async function loadBlacklist() {
+    const token = localStorage.getItem('adminToken');
+    const tbody = document.getElementById('blacklistTbody');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:#888">Loading...</td></tr>';
+    try {
+      const res  = await fetch('/api/admin/buyers', { headers: { 'Authorization': 'Bearer ' + token } });
+      const data = await res.json();
+      const bl   = data.filter(b => b.is_blacklisted);
+      if (!bl.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:#888">No blacklisted buyers ✅</td></tr>';
+        return;
+      }
+      tbody.innerHTML = bl.map(b => `
+        <tr>
+          <td><strong>${b.first_name} ${b.last_name}</strong></td>
+          <td>${b.email}</td>
+          <td style="color:#f66">${b.blacklist_reason||'—'}</td>
+          <td>₹${Number(b.deposit_balance).toLocaleString()}</td>
+          <td><button class="btn btn-green" onclick="unblacklistBuyer(${b.id})">✅ Unban</button></td>
+        </tr>`).join('');
+    } catch(e) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:#f66">Error</td></tr>';
+    }
+  }
+
+  // Auto-load deposits when dashboard opens
+    // ── LOAD REAL BUYERS ─────────────────────────────────
+  async function loadBuyers() {
+    const token = localStorage.getItem('adminToken');
+    const tbody = document.getElementById('buyersTbody');
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#888">Loading...</td></tr>';
+    try {
+      const res = await fetch('/api/admin/buyers', { headers: { 'Authorization': 'Bearer ' + token } });
+      const data = await res.json();
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#888">No buyers registered yet</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(b => `
+        <tr>
+          <td><strong>${b.first_name} ${b.last_name}</strong></td>
+          <td>${b.email}</td>
+          <td>${b.city}</td>
+          <td>${b.membership_paid ? '₹'+Number(b.deposit_balance).toLocaleString() : '<span style="color:#888">Not paid</span>'}</td>
+          <td>${b.is_blacklisted
+            ? '<span class="badge b-black">Blacklisted</span>'
+            : '<span class="badge b-active">Active</span>'}</td>
+          <td><div class="action-btns">
+            ${b.is_blacklisted
+              ? `<button class="btn btn-green" onclick="unblacklistBuyer(${b.id})">Unban</button>`
+              : `<button class="btn btn-red" onclick="blacklistBuyer(${b.id})">Blacklist</button>`}
+          </div></td>
+        </tr>`).join('');
+    } catch(e) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#f66">Error loading buyers</td></tr>';
+    }
+  }
+
+  async function blacklistBuyer(id) {
+    const reason = prompt('Enter reason for blacklisting:');
+    if (!reason) return;
+    const token = localStorage.getItem('adminToken');
+    const res = await fetch('/api/admin/buyers/'+id+'/blacklist', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer '+token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ reason, forfeit_deposit: false })
+    });
+    if (res.ok) { toast('🚫 Buyer blacklisted.'); loadBuyers(); }
+    else toast('❌ Failed');
+  }
+
+  async function unblacklistBuyer(id) {
+    const token = localStorage.getItem('adminToken');
+    const res = await fetch('/api/admin/buyers/'+id+'/unblacklist', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer '+token, 'Content-Type': 'application/json' }
+    });
+    if (res.ok) { toast('✅ Buyer unbanned.'); loadBuyers(); }
+    else toast('❌ Failed');
+  }
+
+  // ── LOAD REAL SELLERS ─────────────────────────────────
+  async function loadSellers() {
+    const token = localStorage.getItem('adminToken');
+    const tbody = document.getElementById('sellersTbody');
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#888">Loading...</td></tr>';
+    try {
+      const res = await fetch('/api/admin/sellers', { headers: { 'Authorization': 'Bearer ' + token } });
+      const data = await res.json();
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#888">No sellers registered yet</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(s => `
+        <tr>
+          <td><strong>${s.store_name}</strong><br><small style="color:#888">${s.first_name} ${s.last_name}</small></td>
+          <td>${s.email}</td>
+          <td>${s.city}</td>
+          <td>⭐ ${s.avg_rating||'0.00'}</td>
+          <td>${s.is_suspended
+            ? '<span class="badge b-black">Suspended</span>'
+            : '<span class="badge b-active">Active</span>'}</td>
+          <td><div class="action-btns">
+            ${s.is_suspended
+              ? `<button class="btn btn-green" onclick="suspendSeller(${s.id},false)">Reinstate</button>`
+              : `<button class="btn btn-red" onclick="suspendSeller(${s.id},true)">Suspend</button>`}
+          </div></td>
+        </tr>`).join('');
+    } catch(e) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#f66">Error loading sellers</td></tr>';
+    }
+  }
+
+  async function suspendSeller(id, suspend) {
+    const token = localStorage.getItem('adminToken');
+    const res = await fetch('/api/admin/sellers/'+id+'/suspend', {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer '+token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ suspend })
+    });
+    if (res.ok) { toast(suspend ? '🚫 Seller suspended.' : '✅ Seller reinstated.'); loadSellers(); }
+    else toast('❌ Failed');
+  }
+
+    // ── LOAD REAL LISTINGS FROM API ──────────────────────
+  async function loadListings() {
+    const token = localStorage.getItem('adminToken');
+    const tbody = document.getElementById('listingsTbody');
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:#888">Loading...</td></tr>';
+    try {
+      const res = await fetch('/api/admin/listings/pending', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await res.json();
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:#888">No pending listings right now ✅</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(l => `
+        <tr>
+          <td><strong>${l.name}</strong><br><small style="color:#888">${l.brand||''}</small></td>
+          <td>${l.store_name}</td>
+          <td>${l.category}</td>
+          <td>${l.listing_type}</td>
+          <td>${l.listing_type==='rent'?'₹'+l.rent_price+'/day':l.listing_type==='buy'?'₹'+l.buy_price:'₹'+l.rent_price+'/d · ₹'+l.buy_price}</td>
+          <td><span class="badge b-pending">Pending</span></td>
+          <td><div class="action-btns">
+            <button class="btn btn-green" onclick="approveListing(${l.id})">Approve</button>
+            <button class="btn btn-red" onclick="rejectListing(${l.id})">Reject</button>
+          </div></td>
+        </tr>`).join('');
+    } catch(e) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:#f66">Error loading listings</td></tr>';
+    }
+  }
+
+  async function approveListing(id) {
+    const token = localStorage.getItem('adminToken');
+    const res = await fetch('/api/admin/listings/'+id+'/status', {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer '+token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'approved' })
+    });
+    if (res.ok) { toast('✅ Listing approved! It is now live on the homepage.'); loadListings(); }
+    else toast('❌ Failed to approve');
+  }
+
+  async function rejectListing(id) {
+    const token = localStorage.getItem('adminToken');
+    const res = await fetch('/api/admin/listings/'+id+'/status', {
+      method: 'PUT',
+      headers: { 'Authorization': 'Bearer '+token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'rejected' })
+    });
+    if (res.ok) { toast('❌ Listing rejected.'); loadListings(); }
+    else toast('❌ Failed to reject');
+  }
+
+  function swDash(tab,el){
+    document.querySelectorAll('.dtab').forEach(b=>b.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.dsec').forEach(c=>c.classList.remove('active'));
+    const t=document.getElementById('ds-'+tab);
+    if(t) t.classList.add('active');
+  }
+
+  function doLogout(){
+    localStorage.removeItem('adminToken');
+    document.getElementById('page-dash').classList.remove('active');
+    document.getElementById('page-login').classList.add('active');
+    document.getElementById('credWrap').style.display='block';
+    document.getElementById('otpWrap').classList.remove('active');
+    document.getElementById('ae').value='';
+    document.getElementById('ap').value='';
+    [1,2,3,4,5,6].forEach(i=>{ const el=document.getElementById('o'+i); if(el) el.value=''; });
+    _adminId=null;
+    toast('👋 Logged out successfully');
+  }
+  // Enter key triggers login
+  document.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){
+      const otpVisible = document.getElementById("otpWrap").classList.contains("active");
+      if(otpVisible){ verifyOTP(); } else { doLogin(); }
+    }
+  });
+  // Safety: make doLogin global
+  window.doLogin = doLogin;
+  window.verifyOTP = verifyOTP;
+</script>
+</body>
+</html>

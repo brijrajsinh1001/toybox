@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ToyBox — Terms & Conditions</title>
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#FFF9F0;--primary:#FF6B35;--pd:#e05520;--sec:#FFD166;
+      --acc:#06D6A0;--purple:#7B5EA7;--dark:#2D2A32;--muted:#8A8490;
+      --card:#fff;--border:#EEE8E0;--err:#ef4444;--warn:#f59e0b;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--dark);}
+
+    /* NAV */
+    nav{background:rgba(255,249,240,.95);backdrop-filter:blur(12px);border-bottom:2px solid var(--border);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;}
+    .logo{font-family:'Baloo 2',cursive;font-size:1.55rem;font-weight:800;color:var(--primary);text-decoration:none;}
+    .logo span{color:var(--purple);}
+    .btn{display:inline-flex;align-items:center;gap:5px;padding:8px 18px;border-radius:50px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.84rem;cursor:pointer;border:none;transition:all .2s;text-decoration:none;}
+    .btn-out{background:transparent;color:var(--primary);border:2px solid var(--primary);}
+    .btn-out:hover{background:var(--primary);color:#fff;}
+    .btn-pri{background:var(--primary);color:#fff;}
+    .btn-pri:hover{background:var(--pd);}
+
+    /* HERO */
+    .hero{background:linear-gradient(135deg,#FF6B35,#f9a03f 50%,#FFD166);padding:56px 40px;text-align:center;color:#fff;}
+    .hero h1{font-family:'Baloo 2',cursive;font-size:2.4rem;font-weight:800;margin-bottom:10px;}
+    .hero p{font-size:.92rem;opacity:.92;max-width:520px;margin:0 auto 18px;line-height:1.7;}
+    .hero-tags{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+    .hero-tags span{background:rgba(255,255,255,.22);padding:5px 16px;border-radius:50px;font-size:.8rem;font-weight:700;}
+
+    /* LAYOUT */
+    .layout{display:grid;grid-template-columns:250px 1fr;gap:28px;max-width:1080px;margin:36px auto;padding:0 22px 100px;}
+
+    /* TOC */
+    .toc{position:sticky;top:80px;align-self:start;}
+    .toc-card{background:var(--card);border-radius:18px;padding:20px;border:2px solid var(--border);}
+    .toc-card h4{font-family:'Baloo 2',cursive;font-size:.95rem;font-weight:800;margin-bottom:12px;}
+    .toc-card a{display:flex;align-items:center;gap:7px;padding:7px 9px;border-radius:9px;text-decoration:none;color:var(--muted);font-weight:700;font-size:.8rem;transition:all .2s;margin-bottom:1px;}
+    .toc-card a:hover,.toc-card a.active{background:var(--bg);color:var(--primary);}
+    .toc-num{width:19px;height:19px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:.66rem;font-weight:800;flex-shrink:0;}
+    .toc-card a.active .toc-num{background:var(--primary);color:#fff;}
+
+    /* SECTIONS */
+    .content section{background:var(--card);border-radius:19px;padding:26px 30px;border:2px solid var(--border);margin-bottom:18px;scroll-margin-top:85px;}
+    .content section h2{font-family:'Baloo 2',cursive;font-size:1.25rem;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:9px;}
+    .content section h3{font-family:'Baloo 2',cursive;font-size:.97rem;font-weight:800;color:var(--primary);margin:14px 0 7px;}
+    .content p{font-size:.87rem;line-height:1.8;color:#444;margin-bottom:9px;}
+    .content ul,.content ol{padding-left:20px;margin-bottom:9px;}
+    .content li{font-size:.86rem;line-height:1.8;color:#444;margin-bottom:3px;}
+
+    /* CALLOUT BOXES */
+    .box-ok{background:#ecfdf5;border-left:4px solid var(--acc);border-radius:0 12px 12px 0;padding:13px 15px;margin:10px 0;font-size:.83rem;font-weight:600;color:#065f46;line-height:1.6;}
+    .box-warn{background:#fff7ed;border-left:4px solid var(--warn);border-radius:0 12px 12px 0;padding:13px 15px;margin:10px 0;font-size:.83rem;font-weight:600;color:#92400e;line-height:1.6;}
+    .box-err{background:#fef2f2;border-left:4px solid var(--err);border-radius:0 12px 12px 0;padding:13px 15px;margin:10px 0;font-size:.83rem;font-weight:600;color:#b91c1c;line-height:1.6;}
+
+    /* DEPOSIT TABLE */
+    .dtbl{width:100%;border-collapse:collapse;margin:12px 0;font-size:.83rem;}
+    .dtbl th{background:var(--bg);padding:9px 13px;text-align:left;font-weight:800;font-size:.76rem;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);}
+    .dtbl td{padding:9px 13px;border-bottom:1px solid var(--border);line-height:1.5;vertical-align:top;}
+    .dtbl tr:last-child td{border-bottom:none;}
+    .g{color:#047857;font-weight:700;}
+    .r{color:#b91c1c;font-weight:700;}
+    .o{color:#b45309;font-weight:700;}
+
+    .last-upd{text-align:center;color:var(--muted);font-size:.77rem;padding:18px;font-weight:600;}
+
+    /* ACCEPT BAR */
+    .accept-bar{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:2px solid var(--border);padding:13px 36px;display:flex;align-items:center;justify-content:space-between;gap:14px;box-shadow:0 -4px 18px rgba(45,42,50,.1);z-index:50;flex-wrap:wrap;}
+    .accept-bar p{font-size:.82rem;color:var(--muted);font-weight:600;flex:1;}
+    .accept-btns{display:flex;gap:9px;}
+
+    @media(max-width:760px){.layout{grid-template-columns:1fr;}.toc{position:static;}.accept-bar{padding:12px 18px;}.hero{padding:36px 18px;}}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="index.html">🧸 Toy<span>Box</span></a>
+  <a href="index.html" class="btn btn-out">← Back to Home</a>
+</nav>
+
+<div class="hero">
+  <h1>📜 Terms &amp; Conditions</h1>
+  <p>Please read carefully before using ToyBox. By registering you agree to be bound by these terms.</p>
+  <div class="hero-tags">
+    <span>📅 Effective: January 1, 2026</span>
+    <span>🔄 Updated: March 1, 2026</span>
+    <span>📍 Applicable in India</span>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- TOC -->
+  <aside class="toc">
+    <div class="toc-card">
+      <h4>📑 Contents</h4>
+      <a href="#platform"    class="toc-a"><span class="toc-num">1</span> About ToyBox</a>
+      <a href="#eligibility" class="toc-a"><span class="toc-num">2</span> Eligibility</a>
+      <a href="#membership"  class="toc-a"><span class="toc-num">3</span> Membership &amp; Deposit</a>
+      <a href="#rental"      class="toc-a"><span class="toc-num">4</span> Rental Rules</a>
+      <a href="#buying"      class="toc-a"><span class="toc-num">5</span> Buying Rules</a>
+      <a href="#sellers"     class="toc-a"><span class="toc-num">6</span> Seller Guidelines</a>
+      <a href="#damage"      class="toc-a"><span class="toc-num">7</span> Damage Policy</a>
+      <a href="#blacklist"   class="toc-a"><span class="toc-num">8</span> Blacklist Policy</a>
+      <a href="#prohibited"  class="toc-a"><span class="toc-num">9</span> Prohibited Items</a>
+      <a href="#privacy"     class="toc-a"><span class="toc-num">10</span> Privacy Policy</a>
+      <a href="#disputes"    class="toc-a"><span class="toc-num">11</span> Disputes</a>
+      <a href="#contact"     class="toc-a"><span class="toc-num">12</span> Contact</a>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <section id="platform">
+      <h2>🧸 1. About ToyBox Platform</h2>
+      <p>ToyBox is an online peer-to-peer marketplace that connects buyers and sellers of pre-loved toys across India. We are a <strong>platform only</strong> — we do not own, store, deliver, or handle any toys listed on ToyBox.</p>
+      <div class="box-ok">✅ ToyBox connects people. All physical transactions, pickup, and drop-off are arranged directly between buyers and sellers. ToyBox is never a party to these transactions.</div>
+      <p>By accessing or using ToyBox you agree to these Terms in full. If you do not agree, please stop using our platform.</p>
+    </section>
+
+    <section id="eligibility">
+      <h2>👤 2. Eligibility</h2>
+      <ul>
+        <li>You must be at least <strong>18 years of age</strong> to register.</li>
+        <li>You must provide a valid Indian mobile number and verify it via OTP.</li>
+        <li>All registration information must be accurate and truthful.</li>
+        <li>One person may hold one buyer account and one seller account only.</li>
+        <li>Blacklisted users are permanently ineligible to re-register without admin approval.</li>
+      </ul>
+    </section>
+
+    <section id="membership">
+      <h2>🎫 3. Membership &amp; Security Deposit</h2>
+      <h3>3.1 What is the Membership Deposit?</h3>
+      <p>Every buyer must pay a one-time <strong>refundable security deposit of ₹3,500</strong> before accessing seller contact details or initiating any transaction.</p>
+      <div class="box-warn">⚠️ This is NOT a subscription fee. It is a security deposit held to protect sellers from damage, non-return, or fraudulent activity by buyers.</div>
+      <h3>3.2 Deduction Rules</h3>
+      <table class="dtbl">
+        <thead><tr><th>Situation</th><th>Action</th><th>Deduction</th></tr></thead>
+        <tbody>
+          <tr><td>Toy returned in good condition</td><td>No action</td><td class="g">₹0 — Deposit intact</td></tr>
+          <tr><td>Minor damage</td><td>Admin deducts repair cost</td><td class="o">₹200–₹700 (est.)</td></tr>
+          <tr><td>Major damage</td><td>Admin deducts repair/replacement</td><td class="o">₹700–₂,000 (est.)</td></tr>
+          <tr><td>Toy NOT returned</td><td>Blacklisted, full deposit forfeited</td><td class="r">₹3,500 forfeited</td></tr>
+          <tr><td>Wrong product sent by seller</td><td>Deducted from seller, not buyer</td><td class="g">₹0 to buyer</td></tr>
+          <tr><td>False damage report</td><td>Buyer blacklisted</td><td class="r">Full deposit forfeited</td></tr>
+        </tbody>
+      </table>
+      <h3>3.3 Deposit Refund</h3>
+      <p>Your ₹3,500 is <strong>fully refunded</strong> when you close your account — provided no deductions, active rentals, or unresolved disputes exist. Refunds are processed within <strong>7 working days</strong>.</p>
+    </section>
+
+    <section id="rental">
+      <h2>🕐 4. Rental Rules</h2>
+      <ul>
+        <li>Rental duration and per-day price are agreed directly between buyer and seller.</li>
+        <li>ToyBox does not handle or process any payment between users.</li>
+        <li>The buyer is <strong>fully responsible</strong> for picking up and returning the toy by the agreed date.</li>
+        <li>The toy must be returned in the same condition it was received.</li>
+        <li>Late returns may result in additional charges determined by the seller.</li>
+      </ul>
+      <div class="box-err">🚫 Failure to return a toy results in <strong>permanent blacklisting</strong> and <strong>full forfeiture of the ₹3,500 deposit</strong>. Legal action may also be initiated.</div>
+    </section>
+
+    <section id="buying">
+      <h2>🛍️ 5. Buying Rules</h2>
+      <ul>
+        <li>Buyers can purchase pre-loved toys directly from sellers.</li>
+        <li>Payment is made directly to the seller — ToyBox does not process payments.</li>
+        <li>Buyers should inspect the toy during pickup before completing the transaction.</li>
+        <li>If a wrong or misrepresented product is received, file a dispute within <strong>24 hours of pickup</strong>.</li>
+        <li>ToyBox is not liable for the quality, condition, or accuracy of toy listings.</li>
+      </ul>
+    </section>
+
+    <section id="sellers">
+      <h2>🏪 6. Seller Guidelines</h2>
+      <ul>
+        <li>Sellers must provide accurate descriptions, real photos, and correct condition grading.</li>
+        <li>Listings with misleading information will be removed and the seller may be suspended.</li>
+        <li>At least <strong>1 real photo</strong> of the actual toy must be uploaded (no stock images).</li>
+        <li>Sellers are responsible for ensuring the toy is clean and safe before handover.</li>
+        <li>All new listings are reviewed by the admin team before going live.</li>
+        <li>Sellers who repeatedly receive damage or wrong-product complaints may be suspended.</li>
+      </ul>
+      <div class="box-warn">⚠️ If a buyer receives a wrong product due to inaccurate listing, the deduction is applied from the <strong>seller's account</strong>, not the buyer's deposit.</div>
+    </section>
+
+    <section id="damage">
+      <h2>🔴 7. Damage Policy</h2>
+      <p>All damage reports must be filed within <strong>24 hours</strong> of receiving or returning the toy. Late reports may not be accepted.</p>
+      <h3>7.1 Filing a Report</h3>
+      <ul>
+        <li>Use the <a href="damage-report.html" style="color:var(--primary);font-weight:700">Damage Report Form</a>.</li>
+        <li>Provide your transaction ID, at least 1 clear photo, and a detailed description.</li>
+      </ul>
+      <h3>7.2 Review Process</h3>
+      <p>The admin team reviews all reports within <strong>48 hours</strong>. Final deduction amount is decided after reviewing evidence.</p>
+      <div class="box-err">🚫 Filing a false damage report results in <strong>permanent blacklisting</strong> and <strong>full deposit forfeiture</strong>.</div>
+    </section>
+
+    <section id="blacklist">
+      <h2>🚫 8. Blacklist Policy</h2>
+      <p>A user will be permanently blacklisted for:</p>
+      <ul>
+        <li><strong>Non-return</strong> of a rented toy after the agreed period.</li>
+        <li><strong>False damage report</strong> with intent to defraud.</li>
+        <li><strong>Repeated damage</strong> to toys across multiple rentals.</li>
+        <li><strong>Fraudulent activity</strong> such as fake listings or impersonation.</li>
+        <li><strong>Harassment or abuse</strong> of other users or ToyBox staff.</li>
+      </ul>
+      <p>Blacklisted users cannot log in or create new accounts. Appeals can be submitted to support — reviewed within 7 working days.</p>
+    </section>
+
+    <section id="prohibited">
+      <h2>⛔ 9. Prohibited Items</h2>
+      <p>The following may NOT be listed on ToyBox:</p>
+      <ul>
+        <li>Broken, unsafe, or recalled toys</li>
+        <li>Counterfeit or replica branded products</li>
+        <li>Items containing hazardous materials (lead paint, choking hazards, etc.)</li>
+        <li>Any item that is not a toy or children's educational product</li>
+        <li>Any illegal or restricted item under Indian law</li>
+      </ul>
+    </section>
+
+    <section id="privacy">
+      <h2>🔒 10. Privacy Policy</h2>
+      <h3>10.1 Data We Collect</h3>
+      <ul>
+        <li><strong>Account data:</strong> name, email, verified mobile number, city</li>
+        <li><strong>Transaction data:</strong> rental history, purchases, deposit records</li>
+        <li><strong>Usage data:</strong> searches, listing views, click patterns</li>
+        <li><strong>Device data:</strong> IP address, browser type, device model</li>
+      </ul>
+      <h3>10.2 How We Use It</h3>
+      <ul>
+        <li>Authenticate identity and manage your account</li>
+        <li>Connect buyers and sellers on the platform</li>
+        <li>Send OTP and platform notifications via SMS/email</li>
+        <li>Process deposit transactions and deductions</li>
+        <li>Improve platform performance and user experience</li>
+      </ul>
+      <h3>10.3 Data Sharing</h3>
+      <p>We do <strong>not</strong> sell your personal data. We share limited data (name, city) with the other party in a transaction to facilitate pickup. Your mobile is only shared after a buyer request is <em>accepted</em> by a seller.</p>
+      <h3>10.4 Security</h3>
+      <p>Passwords are hashed with bcrypt. JWT tokens manage sessions. All API traffic uses HTTPS. Data is retained for up to <strong>3 years</strong> post account closure for legal compliance.</p>
+      <div class="box-ok">✅ You may request personal data deletion by contacting support. Requests are processed within 30 days.</div>
+    </section>
+
+    <section id="disputes">
+      <h2>⚖️ 11. Dispute Resolution</h2>
+      <p>Either party may contact ToyBox support to raise a dispute. We review evidence and make a binding decision within <strong>5 working days</strong>. ToyBox's decision on deposit deductions is final. For other disputes ToyBox acts only as a mediator and holds no legal liability for outcomes between users.</p>
+      <p>These Terms are governed by the laws of India. Disputes are subject to the exclusive jurisdiction of courts in <strong>Vadodara, Gujarat, India</strong>.</p>
+    </section>
+
+    <section id="contact">
+      <h2>📬 12. Contact Us</h2>
+      <ul>
+        <li><strong>Email:</strong> <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="acdfd9dcdcc3ded8ecd8c3d5cec3d482c5c2">[email&#160;protected]</a></li>
+        <li><strong>Phone:</strong> +91 98765 00000 (Mon–Sat, 9 am – 6 pm)</li>
+        <li><strong>Address:</strong> ToyBox India, Vadodara, Gujarat 390001</li>
+      </ul>
+      <p style="margin-top:11px;">ToyBox reserves the right to update these Terms at any time. Continued use of the platform after any update constitutes acceptance of the revised Terms.</p>
+    </section>
+
+    <div class="last-upd">📅 Last updated: March 1, 2026 &nbsp;·&nbsp; Version 2.1 &nbsp;·&nbsp; © 2026 ToyBox India</div>
+  </div><!-- /content -->
+</div><!-- /layout -->
+
+<!-- ACCEPT BAR -->
+<div class="accept-bar" id="acceptBar">
+  <p>By using ToyBox, you agree to these Terms &amp; Conditions and Privacy Policy.</p>
+  <div class="accept-btns">
+    <a href="index.html" class="btn btn-out">Decline</a>
+    <button class="btn btn-pri" onclick="acceptTerms()">✅ I Accept</button>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// Active TOC highlight on scroll
+const sections = document.querySelectorAll('.content section');
+const tocLinks = document.querySelectorAll('.toc-a');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      tocLinks.forEach(a => a.classList.remove('active'));
+      const match = document.querySelector(`.toc-a[href="#${e.target.id}"]`);
+      if(match) match.classList.add('active');
+    }
+  });
+}, { threshold: 0.25, rootMargin: '-75px 0px -55% 0px' });
+sections.forEach(s => obs.observe(s));
+
+function acceptTerms(){
+  document.getElementById('acceptBar').style.display = 'none';
+  try{ localStorage.setItem('tb_terms','1'); }catch(e){}
+  window.h
